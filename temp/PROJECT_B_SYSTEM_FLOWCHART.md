@@ -4,7 +4,7 @@
 
 **Aligned with blueprint revision 2**, retrieved at repository commit `a0f113e` (blueprint change `e57be24`). The main demo includes mid-stream deliverable classification, the second-order `DEC-07` cascade, a transient tracker retry, and a concurrent D3 edit followed by delta re-approval. All diagrams describe proposed behavior, not existing functionality.
 
-**Prototype boundary:** one Python application, six bounded agent roles, LangGraph orchestration, Pydantic validation, and one Streamlit workspace. Five simulated apps (Mail, Team chat, Tracker, Docs, Calendar) will perform actual persistent reads and writes. Domain data and workflow checkpoints use separate SQLite files. A configured live LLM is optional; fixture-mode extraction must be visibly labeled.
+**Prototype boundary:** one Python application, six bounded agent roles, LangGraph orchestration, Pydantic validation, and one Streamlit workspace. Five simulated apps (Mail, Team chat, Tracker, Docs, Calendar) will perform actual persistent reads and writes. Domain data and workflow checkpoints use separate SQLite files. A live Gemini model (via `google-genai`, `MODEL_NAME` configurable) is optional; fixture-mode extraction must be visibly labeled.
 
 Read the diagrams in order. One enormous diagram would hide the important approval and failure branches, so the overview is followed by focused views.
 
@@ -46,7 +46,9 @@ flowchart TD
     P --> COMD["Communication Agent<br/>Draft revised proposal, sponsor reply,<br/>and per-owner internal notifications"]
     COMD --> PRE["Verification Agent: preflight<br/>Independently check plan and evidence"]
     PRE --> PC{"Blocking finding?"}
-    PC -->|Yes| BOUND["Coordinator: bounded replan<br/>Pause for a human if still unresolved"]
+    PC -->|Yes, within replan budget| P
+    PC -->|Yes, budget exhausted| PART
+    BOUND["Coordinator: bounded replan<br/>Pause for a human if still unresolved"]
     BOUND -->|Within replan budget: refresh context| K
     BOUND -->|Budget exhausted| PART
     PC -->|No| H["Human review through pure approval interrupt<br/>Business records, internal notifications,<br/>sponsor-send scope; v2 delta if replanned"]
@@ -99,6 +101,8 @@ flowchart TD
 ```
 
 **Arrow key:** solid arrows show control/data flow. Dotted arrows show persistence, not permission to overwrite arbitrary records. The Coordinator owns routing across the entire run, not just its first box. Repeated Verification and Execution boxes are phases of the same roles, not extra agents.
+
+A blocking preflight finding returns to Planning with the findings (blueprint §5); it shares the two-replan budget. Execution conflicts, permanent failures, and failed read-backs go through the Coordinator's bounded replan, which refreshes context in Knowledge first (blueprint §11.3).
 
 Every handoff is a stored `AgentMessage`; every Coordinator route has a reason. The UI exposes this timeline alongside the business action ledger. Replan paths refresh context and return through preflight and approval; unchanged verified effects are reused, never blindly replayed.
 
@@ -172,7 +176,7 @@ flowchart TD
     DUP -->|Same ID, changed content| REV["Flag source revision conflict<br/>Preserve evidence; require explicit handling"]
     DUP -->|New source| KEEP["Persist immutable source evidence"]
     KEEP --> MODE{"Declared extraction mode?"}
-    MODE -->|Live| LLM["Communication Agent + configured LLM<br/>Scoped evidence, API response schema, constraints"]
+    MODE -->|Live| LLM["Communication Agent + Gemini via google-genai<br/>Scoped evidence, API response schema, constraints"]
     MODE -->|Fixture| FIX["Communication Agent + prepared extraction fixture<br/>Clearly labeled; grounded in this message<br/>Not loaded from test-only final answers"]
     LLM --> SCHEMA["Pydantic boundary validation"]
     FIX --> SCHEMA
@@ -352,6 +356,17 @@ flowchart TD
     MORE -->|Yes| NEXT
     MORE -->|No| VERIFY["Verification Agent reads required final records"]
 ```
+
+**S1 execution order (blueprint §11.4).** The order matters: the injected tracker failure hits the first write, and the D3 conflict can only show "committed effects are not repeated" because the sponsor update is already committed when D3's cancellation runs.
+
+1. Drafts already exist (revised benefits document, sponsor acknowledgment, owner notifications); creating them needed no approval.
+2. Revalidate record versions and plan hash against the current approval.
+3. Update Aster's commitment in the tracker (fail-once injection here). The budget balance is computed from commitments, not written.
+4. Update tier and benefits document; supersede `DEC-05` with a new Silver-package decision; mark `DEC-07` `at_risk`.
+5. Cancel D3 (concurrent-edit injection here, which leads to plan v2); remove D4 from the run sheet; record `flag_human` items.
+6. Upsert the review calendar item.
+7. Verify business records, then post approved internal notifications.
+8. Send the sponsor reply only if that scope was approved; otherwise keep the draft.
 
 **Three different identities:**
 
@@ -596,7 +611,7 @@ flowchart LR
     RUN -->|Missing evidence| HUMAN["Awaiting human<br/>Clarification or correction"]
     HUMAN -->|Established evidence| RUN
     RUN --> APPROVAL["Awaiting approval<br/>Plan and checkpoint persisted"]
-    APPROVAL -->|Reject| STOP["Stopped / rejected"]
+    APPROVAL -->|Reject| STOP["rejected<br/>No business writes"]
     APPROVAL -->|Edit or stale version| RUN
     APPROVAL -->|Current exact approval| EXEC["Executing<br/>Ledger protects effects"]
     EXEC --> RETRY["Retry wait<br/>Bounded attempts"]
@@ -687,29 +702,31 @@ Every handoff uses `AgentMessage` fields: `message_id`, `run_id`, `from_role`, `
 
 ### Proposed single-workspace layout
 
+P0 uses the six panels of blueprint §16; panels marked P1 are added only after P0 is reliable.
+
 1. **Scenario and mode controls:** fixture/live extraction, simulated connectors, DEMO_NOW, reset, tracker and concurrent-edit faults.
-2. **Inbox and evidence:** email thread, team chat, contact authority, timestamps, spans, conflicting claims.
-3. **Understanding and correction:** extracted fields, source spans, questions; richer inline editing is P1.
+2. **Inbox and evidence:** email thread, team chat, contact authority, timestamps, highlighted extracted fields and spans, conflicting claims.
+3. **Understanding and correction (P1):** a separate panel with inline correction controls. In P0, extracted fields and clarification questions appear in panel 2.
 4. **Impact and plan:** declared/inferred graph paths, lifecycle classifications, budget delta, DEC-07 risk, exact diffs, eight rules.
 5. **Human decision:** three scopes, approve/reject, current plan hash, v2 delta approval; arbitrary proposal editing is P1.
 6. **Execution activity:** six-role handoff timeline, routing reasons, receipts, attempts, v1/v2, partial/unknown states.
 7. **Verification and results:** fresh values, audit trail, communication status, remaining decisions.
-8. **Evaluation evidence:** measured prepared-case results; an integrated scorecard is optional, test results are not.
+8. **Evaluation evidence (P1, optional):** measured prepared-case results in the UI. In P0, test results live in pytest output and the README.
 
 UI rerenders read persisted status. They must not trigger effects just because a panel is displayed or refreshed.
 
 ## 13. Build order, scope, and non-negotiable boundaries
 
-**Recommended build sequence:**
+**Build sequence (same as blueprint §19.1):**
 
-1. Commit revision 2's fabricated sources, D1-D4, DEC-05/DEC-07, dependencies, scenarios, DEMO_NOW and test-only answers.
-2. Implement SQLite seed/reset, record versions, allowlisted tools, and transactional operation receipts.
-3. Make the deterministic S1 extraction/context/rules/lifecycle/preflight/approval/execution/read-back/replay slice work.
-4. Connect the six named roles through LangGraph with durable checkpoints and typed context.
-5. Add preflight, approval/rejection, execution, read-back verification, and a minimal Streamlit workspace.
-6. Add fail-once tracker injection and concurrent D3 edit: refresh, v2 preflight, delta approval, verified-effect reuse; test timeout and restart behavior.
-7. Add a live model for grounded extraction and drafts; keep fixture mode honestly labeled.
-8. Show owner notifications, actual handoff timeline, edge provenance and measured results; add P1 S2 recall only after P0 is reliable, then rehearse.
+1. Fabricate the consistent cross-app baseline, S1 scenario inputs, and test-only expected outcomes (sources, D1-D4, DEC-05/DEC-07, dependencies, scenarios, DEMO_NOW).
+2. SQLite schema, seed/reset, record versions, allowlisted tools with typed failures, operations ledger.
+3. Deterministic S1 test: fixture extraction → resolve → traverse → `EVT-*` findings → classify → plan → preflight → approve → execute → read-back verify → replay.
+4. LangGraph wiring of the six roles with the SQLite checkpointer; interrupt/resume test across a restart.
+5. Fault injection: fail-once tracker retry, then concurrent D3 edit → refresh → v2 preflight → delta approval → verified-effect reuse.
+6. Streamlit UI: inbox/evidence, impact preview, preflight findings, approval, agent timeline, verification.
+7. Live Gemini extraction behind `LLM_MODE=live`, validated by span checks; fixture mode stays labeled.
+8. Alias/ID inferred edges, owner notifications, summary; then P1 items (S2 recall first) only after P0 is reliable; rehearse.
 
 **Scope distinction:** P0 includes all 11 revision 2 demo items: fabricated multi-source data and simulated time; extraction; identity/context/declared-plus-alias-inferred traversal; eight rules and lifecycle/decision classification; preflight; approval with three scopes; transactional execution and tracker retry; adaptive D3 replan with delta approval; read-back/summary/ledger/handoff timeline; replay protection; restart-safe approval. P1 includes S2 long-term recall, richer inline editing, contradictory-message scenarios, graph polish, permanent-calendar fallback, downloadable reports, and optional live test Sheet. Gmail, Sheets, and Calendar OAuth are not prerequisites.
 

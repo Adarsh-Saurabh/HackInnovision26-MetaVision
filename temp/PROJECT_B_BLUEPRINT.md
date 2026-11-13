@@ -591,7 +591,7 @@ Use provider idempotency keys where available; otherwise attach a stable marker 
 - Resume from checkpoints and consult the ledger before every write. A restarted run never resends messages or recreates calendar items.
 - No blind rollback after partial external success: keep receipts, reconcile, propose forward repair, re-approve if effects change.
 
-Action statuses: `planned`, `awaiting_approval`, `ready`, `running`, `retry_wait`, `unknown`, `committed`, `verified`, `failed`, `blocked`, `superseded`. Run statuses: `completed_verified`, `awaiting_human`, `partial`, `failed`.
+Action statuses: `planned`, `awaiting_approval`, `ready`, `running`, `retry_wait`, `unknown`, `committed`, `verified`, `failed`, `blocked`, `superseded`. Run statuses: `completed_verified`, `awaiting_human`, `partial`, `failed`, `rejected` (human rejected the first plan; no business writes). Rejecting a v2 delta after some effects committed is `partial`, not `rejected`.
 
 ## 15. Verification and explainability
 
