@@ -8,6 +8,10 @@ Prepared November 14, 2026, for HackInnovision 2026.
 
 **Recommended decision:** build one reliable sponsor-change workflow with six bounded agent roles, persistent evidence and dependencies, a human approval gate, fault recovery, and an inspectable action ledger. Make this work before adding external integrations.
 
+**Prototype scope, confirmed:** fabricate a consistent event dataset and use persistent simulated email, messaging, spreadsheet, document, and calendar tools. No Gmail, Sheets, or Calendar credentials are needed for the core build. A live Gemini call can interpret synthetic messages; fixture mode supports offline development. One real connector is optional only after the full simulated workflow passes its checks.
+
+**Design update:** incorporate lessons from the user-supplied `uplan-ai` analysis: typed graph context, explicit deterministic findings, and independent preflight review. Keep the new event workflow and its execution guarantees separate from that earlier document-verdict pipeline; see section 1.4.
+
 ## Contents
 
 1. Official brief and constraints
@@ -73,6 +77,27 @@ Page 5 suggests a sponsor-change run-through with a recovered failure, an approv
 ### 1.3 Facts versus our choices
 
 The sponsor names, amounts, benefit thresholds, safety rules, schemas, performance targets, stack, and build schedule below are proposed design choices. They are not extra organizer requirements. Success in judging cannot be guaranteed; the plan aims to make the published criteria visible and defensible.
+
+### 1.4 Lessons from the earlier uplan-ai project
+
+Reference: the user's supplied repository analysis of [saikiran76/uplan-ai](https://github.com/saikiran76/uplan-ai). This comparison is based on that report, not an independent audit or execution of the upstream source. Reported implementation details, compression figures, privacy guarantees, and quota limits remain unverified.
+
+The report describes an immigration-document pipeline: extract PDFs into typed graph data, run deterministic rules, obtain specialist findings, then synthesize a verdict. Second Brain needs a different final outcome: approved changes to persistent application records, followed by independent verification.
+
+| Pattern described in uplan-ai | Decision for Second Brain |
+|---|---|
+| Pydantic extraction and a compact `SemanticGraph` | Adapt the design: typed event entities, claims, dependencies, and source references; build role-specific context bundles |
+| Deterministic checks before model reasoning | Add named event rules and structured findings before planning; Python owns arithmetic and policy gates |
+| Specialist agents followed by synthesis | Keep the six Track B roles; final output reports verified effects and unresolved work rather than a visa verdict |
+| Sequential execution under provider limits | Start sequentially, with bounded calls and actual provider retry guidance; do not inherit fixed delays or reported RPM limits |
+| Raw-document purge after extraction | Do not copy this behavior: preserve synthetic source evidence so humans and verification can inspect exact facts |
+| FastAPI/SSE plus a second legacy UI | Keep Streamlit as the single MVP UI; do not introduce a second backend/UI merely to mirror the old project |
+| Flash extraction plus Pro reasoning | Start with one supported configured model; add a second only if measured failures justify it |
+| Reported missing server dependencies | Commit and test the complete dependency manifest/lockfile in a clean environment |
+
+Use these as architectural lessons, not as instructions to transplant old code, prompts, visa rules, datasets, or UI. The brief requires development during this hackathon window. Keep the earlier project's provenance explicit; copying it into this submission is outside this plan.
+
+The useful adversarial element is an independent check of the proposed plan: missing evidence, unsupported benefits changes, omitted dependents, or stale versions must be surfaced before approval. Implement this inside the existing Verification role, primarily with deterministic checks; no seventh debate agent is needed.
 
 ## 2. Winning thesis and judging alignment
 
@@ -179,8 +204,11 @@ flowchart TD
     UI[Streamlit workspace] --> C[Coordinator]
     C --> COM[Communication Agent]
     COM --> K[Knowledge Agent]
-    K --> P[Planning Agent]
-    P --> G{Policy and approval gate}
+    K --> RULES[Deterministic event rules]
+    RULES --> P[Planning Agent]
+    P --> PRE[Verification Agent: preflight]
+    PRE -->|Blocking finding| P
+    PRE -->|Checks passed| G{Policy and approval gate}
     G -->|Needs clarification| UI
     G -->|Rejected| STOP[Stopped with audit record]
     G -->|Approved current plan| E[Execution Agent]
@@ -195,7 +223,7 @@ flowchart TD
     V --> T
 ```
 
-Detailed route: ingest -> deduplicate -> extract -> validate -> resolve identity -> gather context -> traverse dependencies -> plan -> policy validation -> preview -> approve/reject -> revalidate versions -> execute ready actions -> verify -> summarize. Unresolved identity or authority pauses before planning consequential updates.
+Detailed route: ingest -> deduplicate -> extract -> validate -> resolve identity -> build evidence-backed graph context -> deterministic findings -> plan -> independent preflight checks -> preview -> approve/reject -> revalidate versions -> execute ready actions -> read-back verification -> summarize. Unresolved identity or authority pauses before planning consequential updates. Preflight failures use the same bounded replan budget as other conflicts; unresolved failures pause for a human rather than loop.
 
 Keep graph checkpoint storage and business storage conceptually separate, even if both use SQLite. Checkpoints restore workflow progress; domain tables store commitments and evidence; the operation ledger protects side effects. None substitutes for the others.
 
@@ -222,6 +250,8 @@ Model choice is an account/availability decision, not a fixed requirement. Test 
 
 Use model calls for language interpretation, ambiguous intent explanations, and drafts. Use deterministic code for totals, dependency traversal, policy gates, approved-field enforcement, retries, and verification. The Knowledge and Execution roles can primarily be tool-driven; do not manufacture LLM chatter to inflate the agent count.
 
+The older project's PDF-to-image extraction is not needed for our JSON/text fixtures. Do not add PyMuPDF, a separate FastAPI server, a base-agent inheritance hierarchy, or fixed Flash/Pro model routing for this MVP. A later PDF input or live adapter must justify its own dependency.
+
 **Alternative stack decisions:** Next.js/React plus FastAPI can give more UI control but adds two runtimes and an API integration boundary. Choose that only if a teammate already moves much faster in it. PostgreSQL is a reasonable later replacement for concurrent hosting. Neo4j and vector search are unnecessary for a few dozen synthetic records. SQLite is a lightweight disk-backed option for this prototype, as described by the [Python SQLite documentation](https://docs.python.org/3/library/sqlite3.html).
 
 ## 7. Six agent contracts
@@ -233,9 +263,9 @@ Each role gets a bounded input, a validated output, explicit permissions, and a 
 | Coordinator | Event envelope, run state, node results | Next route, run status, stop reason | Dispatch and limits; no direct business mutation; every run ends or pauses explicitly |
 | Communication | Email/message body, sender metadata, source ID | Proposed change, source spans, ambiguities; later response draft | Read supplied source and draft only; no automatic sending; every extracted fact cites evidence |
 | Knowledge | Proposed entities and event scope | Resolved IDs, current records, graph paths, conflicts | Scoped retrieval and evidence ingestion; no commitment overwrites based on unapproved claims |
-| Planning | Change, evidence bundle, dependency paths, policy | Versioned action DAG, diffs, risks, preconditions, checks | Propose allowlisted actions; no tool writes; plan passes static validation |
+| Planning | Change, evidence bundle, dependency paths, policy, rule findings | Versioned action DAG, diffs, risks, preconditions, checks | Propose allowlisted actions; no tool writes; plan passes static validation |
 | Execution | Approved current plan, action readiness, operation ledger | Per-action receipt or typed failure | Execute only approved allowlisted tools, bounded retries; every outcome recorded |
-| Verification | Plan, receipts, fresh tool reads | Passed/failed predicates, residual issues, final status | Read-back independently; no blind acceptance of the executor's success claim |
+| Verification | Plan and findings before approval; receipts and fresh reads after execution | Phase-tagged preflight/read-back results, residual issues, final status | Independently check evidence, dependency coverage and policy, then actual effects; no business writes or self-approval |
 
 Coordinator routing should be deterministic where possible. A model may suggest a replan, but the state machine decides whether an action is allowed. Verification must perform actual reads and assertions rather than ask the same model whether its own output looks correct.
 
@@ -250,13 +280,14 @@ Use small Pydantic models or typed state with validated payloads. Proposed field
 | SourceEvent | `source_system`, `external_id`, `event_id`, `received_at`, `occurred_at`, `sender_id`, `body`, `content_hash` |
 | ChangeRequest | `event_id`, `sponsor_id`, `field`, `old_value_claim`, `new_value`, `currency`, `effective_at`, `evidence_ids`, `ambiguities`, `authority_status` |
 | ContextBundle | `record_versions`, `facts`, `dependency_paths`, `policy_ids`, `conflicts`, `retrieved_at` |
+| RuleFinding | `rule_id`, `phase`, `status` (`pass`, `fail`, `unknown`), `blocking`, `expected`, `observed`, `evidence_ids`, `affected_ids` |
 | Plan | `plan_id`, `version`, `source_event_id`, `context_hash`, `actions`, `risk_summary`, `unresolved_items` |
 | Action | `action_id`, `tool`, `target_id`, `before`, `after`, `depends_on`, `expected_version`, `risk`, `verification_spec` |
 | Approval | `approval_id`, `plan_id`, `plan_version`, `plan_hash`, `approver_id`, `decision`, `approved_actions`, `decided_at` |
 | Receipt | `operation_key`, `action_id`, `attempt`, `status`, `external_reference`, `observed_version`, `error_class`, `timestamps` |
-| VerificationResult | `action_id`, `predicate`, `expected`, `observed`, `passed`, `evidence_id` |
+| VerificationResult | `phase` (`preflight` or `read_back`), `action_id`, `predicate`, `expected`, `observed`, `passed`, `evidence_id` |
 
-Run state includes `run_id`, source reference, node status, plan reference, approval reference, pending actions, receipts, verification results, retry counts, and structured errors. Keep bulky original documents in evidence storage; do not copy them into every checkpoint.
+Run state includes `run_id`, source reference, node status, rule findings, plan reference, approval reference, pending actions, receipts, verification results, retry counts, and structured errors. Keep bulky original documents in evidence storage; do not copy them into every checkpoint.
 
 Example extracted change, deliberately a design example:
 
@@ -327,6 +358,8 @@ Build a context bundle per role rather than forwarding every message to every ag
 6. Attach source IDs, quoted spans, timestamps, authority labels, and record versions.
 7. Record the bundle hash so a pending approval can be invalidated when relevant context changes.
 
+This is the event-workflow equivalent of the compact graph representation described in uplan-ai. Compress repeated context, not evidence: retain exact amounts, currency, dates/timezones, source spans, authority, policy conditions, versions, and unresolved competing claims. Preserve the original synthetic sources outside prompts. If a required fact cannot be grounded in the bundle, retrieve it or pause. Measure raw-input versus context-bundle tokens on our own fixtures; do not reuse the report's approximately 98% compression claim or assume a fixed 1,200-token graph.
+
 Start with relational lookups and alias tables. Add full-text search only when the corpus actually requires it. A vector store is not a replacement for identity resolution or dependency tracking.
 
 Recommended context budget: roughly 4,000-8,000 input tokens for a small extraction/planning call, adjusted after measuring the chosen model. Truncate irrelevant history, never the evidence needed to justify a planned write.
@@ -346,6 +379,25 @@ Conflict policy:
 Separate facts, recommendations, and executable actions. A detected deficit is a fact; “cut catering” is a recommendation needing additional evidence and authority.
 
 Each action needs target ID, exact diff, expected version, dependencies, evidence references, allowed tool, approval requirement, and verification predicate. The planner may generate a proposal, but deterministic code validates all targets, supported fields, arithmetic, graph cycles, and permissions before showing approval.
+
+### 11.1 Deterministic event rules and preflight review
+
+Use stable IDs for explainable findings, adapting the earlier project's rule-engine pattern to this domain. These are new event rules, not reused immigration checks:
+
+| Rule | Check / outcome |
+|---|---|
+| `EVT-SRC-001` | Amount/currency, sponsor identity, and authorized source are established; missing or contradictory evidence blocks the proposed write |
+| `EVT-FIN-001` | Recompute commitments, expenses, and forecast in integer paise; a deficit is a disclosed finding, not permission to cut expenses |
+| `EVT-BEN-001` | Proposed benefits follow the cited policy and approval scope; the model cannot invent a tier threshold or cancel a contract |
+| `EVT-DEP-001` | Every affected known dependency has an action or an explicit unresolved/excluded disposition; a blocking unresolved prerequisite prevents completion |
+| `EVT-APR-001` | A consequential action has an approval for its exact current payload and relevant versions; enforce again immediately before execution |
+| `EVT-VER-001` | After execution, observed values and logical record counts match the approved effects; an executor receipt alone cannot pass this rule |
+
+Evaluate only rules applicable to the current phase. Before approval, `EVT-APR-001` marks actions as requiring approval rather than treating the not-yet-made decision as a planning failure. Missing required data yields `unknown`, not `pass`; block affected writes and ask for clarification. Warnings such as a fully disclosed budget deficit can proceed only within the defined approval policy. Version findings against the context/plan so old results cannot authorize revised actions.
+
+The Verification role reviews the plan before the human sees it and reads records again after execution. Keep these two checks distinct in the log. An optional model critique can explain a possible omission, but deterministic rules decide gates and actual reads establish effects.
+
+### 11.2 Approved execution and replanning
 
 Suggested action order for the example:
 
@@ -386,7 +438,7 @@ Typed failures: validation, unauthorized, not found, version conflict, rate limi
 
 Fault injection should select a specific operation and attempt and persist that it fired. A UI rerun must not reset the fail-once flag and cause perpetual failure. Keep injection disabled for normal runs and clearly visible during the demo.
 
-For a live connector, use a test account/document and the narrowest appropriate scopes. Keep credentials out of source control and logs. Complete auth setup early; if it takes more than roughly 20 minutes, return to the simulated path. API registration, OAuth verification, webhooks, and provider-specific restrictions can consume the entire event.
+Gmail, Sheets, and Calendar integration is deferred for the prototype. After the simulated vertical slice passes, choose at most one live connector, preferably a test sheet. Use a test account/document and the narrowest appropriate scopes; keep credentials out of source control and logs. Time-box that optional auth setup to roughly 20 minutes. Keep the same tool contract so an adapter can change without rewriting agent logic; do not build a generic integration framework in advance.
 
 ## 13. Approval and safety policy
 
@@ -480,6 +532,8 @@ Streamlit reruns must not trigger writes implicitly. Buttons dispatch a persiste
 
 Prepare a small, human-auditable dataset: three sponsors, one event budget, roughly five documents/policies, a handful of messages, promotional tasks, approvals, and calendar entries. More data is not inherently more convincing.
 
+Fabricate this dataset ourselves; no external dataset or access to real accounts is required. Write one consistent baseline first, then independent scenario inputs. Keep sponsor/contact IDs, source timestamps, policy thresholds, and dependent records aligned across the simulated applications. Synthetic email and messaging history should contain natural language for the live model to interpret, not only pre-extracted answers.
+
 Proposed fixture files when implementation starts:
 
 ```text
@@ -491,10 +545,13 @@ data/fixtures/
   documents.json
   tasks.json
   calendar.json
+  scenarios.json
   expected_outcomes.json
 ```
 
 Every source needs an ID, source system, timestamp with offset, body, author identity, and event scope. Fixture dependencies need evidence references. Expected outcomes should be independent test expectations, not values generated by the planner being tested.
+
+`scenarios.json` selects the baseline, triggering source event, and any deliberate fault/conflict. Load a fresh baseline into SQLite for each scenario so runs do not contaminate one another. Expected outcomes are test-only: never expose them through agent tools or prompts. Fix the scenario clock where relative deadlines are used; replay on a friend's PC must not depend on wall-clock time. The simulation must mutate actual records and verify them, not return canned success messages.
 
 | Case | Expected behavior |
 |---|---|
@@ -527,6 +584,8 @@ Minimum checks to implement with the workflow:
 - Crash/restart preserves pending approval and completed receipts.
 - Verification detects an intentionally wrong or partial tool write.
 - Schema failures, authority ambiguity, and prompt injection cannot bypass the policy gate.
+- Compact context preserves every decision-critical amount, timestamp, source reference, and unresolved conflict in the fixture; required evidence omitted from a bundle causes retrieval or a pause.
+- Preflight catches a deliberately omitted dependent task, unsupported benefit change, and missing approval requirement; test expectations are unavailable to the planner.
 
 Measure rather than claim:
 
@@ -547,14 +606,14 @@ Targets are not achieved results. Record actual pass counts, latency, tokens, an
 
 ### 19.1 Build in this dependency order
 
-1. Define the synthetic scenario and expected final state.
+1. Fabricate a consistent cross-application baseline, independent scenario inputs, and test-only expected final states.
 2. Implement SQLite seed/reset, evidence IDs, versions, and tool functions.
 3. Add the deterministic end-to-end test with approval and duplicate replay.
-4. Connect the six named roles through LangGraph and persist checkpoints.
+4. Connect the six named roles through LangGraph, build compact typed context and deterministic findings, and persist checkpoints.
 5. Add approval UI, receipts, and read-back verification.
 6. Add transient failure injection and timeout reconciliation.
 7. Add one live model call for structured extraction; validate against source/authority rules.
-8. Add dependency preview and concise run summary.
+8. Show preflight findings, dependency preview, and a concise verified-effects summary in the single Streamlit UI.
 9. Add conflict/stale-approval scenario, then rehearse.
 
 Do not spend the first half of the event tuning prompts while no tool can reliably update a record.
@@ -627,7 +686,7 @@ Do not add a license without choosing it intentionally. Public source availabili
 
 ## 22. Proposed repository structure
 
-Current tracked initialization: `README.md`, this blueprint, original PDF, `.gitignore`, `.gitattributes`, `.editorconfig`.
+Current tracked initialization: `README.md`, `setup.md`, this blueprint, original PDF, `.gitignore`, `.gitattributes`, `.editorconfig`.
 
 Proposed structure after implementation, not empty directories to create now:
 
@@ -644,8 +703,8 @@ HackInnovision/
     storage.py                # SQLite schema, seed, retrieval, transactions
     workflow.py               # Six bounded roles, graph routing and checkpoints
     tools.py                  # Simulated connectors and typed failures
-    policy.py                 # Approval binding and allowed effects
-    verification.py           # Independent read-back invariants
+    policy.py                 # Deterministic event rules, approval binding, allowed effects
+    verification.py           # Independent preflight and read-back checks
   data/fixtures/              # Synthetic source records and expected outcomes
   tests/                      # Reliable end-to-end and focused boundary tests
   runtime/                    # Ignored databases and operational output
@@ -682,6 +741,7 @@ Budget guidance, to measure during implementation:
 - Count input/output tokens per run. Cost = input tokens / 1,000,000 * provider input rate + output tokens / 1,000,000 * provider output rate, plus any provider-specific charges.
 - Check the selected provider's current pricing and quotas in the account before live testing; no specific price/free-tier guarantee is assumed here.
 - Cache immutable source extraction keyed by content hash only when safe; do not cache current approval or record versions.
+- Record compact-context token counts on our own data; neither the earlier project's compression percentage nor its reported provider rate limits are measurements of this application.
 - Target a small dataset, under roughly 100 entities and a few hundred edges initially. This is a scope choice, not a performance benchmark.
 
 Do not let cost optimization remove evidence, validation, or verification. Cut unnecessary calls and irrelevant context first.
@@ -735,11 +795,14 @@ Working prototype, accessible repository or zip, short README with setup and exa
 | Duplicate writes or uncertain delivery | Stable operation keys, transactional ledger, provider reconciliation |
 | Concurrent record edit | Compare-and-set versions; pause and replan |
 | Graph links are guessed | Require provenance; preserve unresolved dependency gaps |
+| Earlier project treated as a drop-in solution | Use its design lessons only; build event-specific data, rules, approvals, tools, and recovery during this event |
 | Production claims exceed implementation | Describe single-process, synthetic, single-user prototype honestly |
 | Deadline ambiguity | Confirm with organizers; target 9:30 AM ready state |
 | Over-polished UI hides weak reliability | Rehearse failure, replay, and verification before cosmetic work |
 
 Next concrete implementation task: create the synthetic Aster dataset and a test that approves the INR 60,000 change, survives a fail-once tracker write, verifies the INR 10,000 deficit, then replays the same message with no extra effects. That one vertical slice becomes the foundation for the full prototype.
+
+No Google application credentials are a prerequisite for this task. Start with JSON fixtures, SQLite-backed tools, deterministic rules, and fixture-mode extraction; add live Gemini extraction after the reliable path works. Keep the prior project's role as design inspiration explicit in the final write-up.
 
 Open decisions to resolve during implementation: team size, available model/key and budget, required submission portal, actual deadline, whether an external account is ready, and whether deployment is needed. None blocks building the simulated core.
 
@@ -755,3 +818,5 @@ Technical sources were checked during preparation on November 14, 2026. Their AP
 - [Streamlit st.status](https://docs.streamlit.io/develop/api-reference/status/st.status): visible workflow progress.
 
 Repository: [Adarsh-Saurabh/HackInnovision26-MetaVision](https://github.com/Adarsh-Saurabh/HackInnovision26-MetaVision).
+
+Prior-project reference: user-supplied analysis of [uplan-ai](https://github.com/saikiran76/uplan-ai), reviewed as architectural background only. No upstream source audit, runtime validation, code migration, or benchmark reproduction was performed for this update.

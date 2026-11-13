@@ -16,6 +16,8 @@ Planning and repository initialization only. No application, dependency environm
 
 Recommended first build: Python, LangGraph, SQLite, Pydantic, and Streamlit, with simulated email, tracker, document, and calendar tools. Add a live model after the deterministic workflow works.
 
+Prototype scope: fabricate the cross-application dataset; defer Gmail, Sheets, and Calendar APIs. The blueprint adapts typed graph context and deterministic-rule patterns from the supplied uplan-ai analysis, while retaining source evidence and adding independent preflight checks, approvals, and verified execution. Prior application code is not included.
+
 ## First implementation milestone
 
 Build one vertical slice: synthetic sponsor email -> structured change -> dependency impact -> approval -> idempotent updates -> read-back verification -> audit trail. Include a deliberate tool failure and prove that replay does not duplicate effects.
