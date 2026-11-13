@@ -8,6 +8,7 @@ HackInnovision 2026, Track B: Agentic Workflow Automation & Context Engineering.
 
 - [Shared PC and skill setup](setup.md): consistent environment, Git workflow, Ponytail/Caveman installation and usage for every teammate.
 - [Detailed Project B blueprint](temp/PROJECT_B_BLUEPRINT.md): requirements, architecture, stack, memory, agents, reliability, implementation sequence, evaluation, and demo strategy.
+- [Complete system flowcharts](temp/PROJECT_B_SYSTEM_FLOWCHART.md): revision 2 visual workflow covering all six agents, mid-stream deliverables, corrections, scoped approval, adaptive replanning, recovery, outputs, and evaluation.
 - [Official problem statement](HackInnovision2026_PS.pdf): the source of the event requirements.
 
 ## Repository status
@@ -20,7 +21,7 @@ Prototype scope: fabricate the cross-application dataset; defer Gmail, Sheets, a
 
 ## First implementation milestone
 
-Build one vertical slice: synthetic sponsor email -> structured change -> dependency impact -> approval -> idempotent updates -> read-back verification -> audit trail. Include a deliberate tool failure and prove that replay does not duplicate effects.
+Build one vertical slice: synthetic email thread and team chat -> structured change -> dependency impact and deliverable classification -> preflight -> scoped approval -> idempotent updates -> read-back verification -> action ledger and agent timeline. Include a fail-once tracker write and a concurrent deliverable edit that triggers plan v2, delta re-approval, and reuse of completed effects. Prove that replay does not duplicate effects.
 
 ## Event timing
 
