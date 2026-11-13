@@ -6,6 +6,7 @@ HackInnovision 2026, Track B: Agentic Workflow Automation & Context Engineering.
 
 ## Start here
 
+- [Shared PC and skill setup](setup.md): consistent environment, Git workflow, Ponytail/Caveman installation and usage for every teammate.
 - [Detailed Project B blueprint](temp/PROJECT_B_BLUEPRINT.md): requirements, architecture, stack, memory, agents, reliability, implementation sequence, evaluation, and demo strategy.
 - [Official problem statement](HackInnovision2026_PS.pdf): the source of the event requirements.
 
