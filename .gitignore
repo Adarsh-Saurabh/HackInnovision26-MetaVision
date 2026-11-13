@@ -1,0 +1,44 @@
+# Python environments and generated files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+credentials*.json
+token*.json
+
+# Runtime state; synthetic fixtures should be JSON/CSV committed separately
+runtime/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.log
+
+# Generated PDF inspection files, not the planning document
+temp/brief-*.png
+tmp/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Only relevant if a separate frontend is added later
+node_modules/
+.next/
