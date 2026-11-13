@@ -4,11 +4,11 @@ Read **Resume here** first. This is Ujjwal's file; teammates' files are in the s
 
 ## Resume here
 
-_Updated: 2026-11-14 03:16 IST by Ujjwal session 2. Commit `85bb227` on `main` (in sync with `origin/main`); uncommitted changes: `.claude/settings.json` only (kept local on purpose: contains a machine-specific path)._
+_Updated: 2026-11-14 04:02 IST by Ujjwal session 3. Commit `f418738` on `main` (pushed, in sync with `origin/main`); uncommitted changes: `.claude/settings.json` only (kept local on purpose: contains a machine-specific path)._
 
-**Working on:** blueprint is final for now (revision 2 merged with Adarsh's update, pushed). Next area: S1 fixtures and expected outcomes, §4/§17.
+**Working on:** planning docs are now consistent: the blueprint, Adarsh's flowchart (`temp/PROJECT_B_SYSTEM_FLOWCHART.md`) and the new plain-language guide (`temp/PROJECT_B_ARCHITECTURE_SIMPLE.md`). Next area: S1 fixtures and expected outcomes, §4/§17.
 
-**Next action:** Agree the P0 split with Adarsh and Vaibhav (§20, 3 people), then write `data/fixtures/` (incl. `scenarios.json`) and hand-written `expected_outcomes.json` for S1 exactly as in blueprint §4.1-§4.5 and §17.
+**Next action:** Agree the P0 split with Adarsh and Vaibhav (§20, 3 people), then write `data/fixtures/` (incl. `scenarios.json`) and hand-written `expected_outcomes.json` for S1 exactly as in blueprint §4.1-§4.5 and §17. No more planning-doc work before code.
 
 **Team P0 progress (§3.1, now 11 items)**, as known at this update
 | # | Item | Status | Owner | Where / notes |
@@ -25,15 +25,42 @@ _Updated: 2026-11-14 03:16 IST by Ujjwal session 2. Commit `85bb227` on `main` (
 | 10 | Replay source message: zero duplicate effects | not started | | |
 | 11 | Paused approval survives process restart | not started | | |
 
-**Schedule (§19.2):** 03:16 IST, inside the 02:30-04:00 slot where the deterministic S1 test should already pass; no code exists. Behind by ~1.5 slots. If still behind at 04:30, apply §19.2 cuts (alias-only inferred edges, no live LLM until UI works); at 06:00, replan at pre-execution revalidation instead of mid-execution.
+**Schedule (§19.2):** 04:02 IST, end of the 02:30-04:00 slot where the deterministic S1 test should already pass; still no code (no fixtures, no `pyproject.toml`). Behind by ~2 slots. At 04:30 apply §19.2 cuts (alias-only inferred edges, no live LLM until UI works); at 06:00, replan at pre-execution revalidation instead of mid-execution.
 
-**Run / test commands that work now:** none yet (no `pyproject.toml`, `uv.lock`, tests, or `app.py`). Git: `git push origin main` works from this PC now (Git Credential Manager login done in the VS Code terminal).
+**Run / test commands that work now:** none yet (no `pyproject.toml`, `uv.lock`, tests, or `app.py`). Git: `git push origin main` works from the agent shell.
 
-**Blockers, open decisions, and needs from teammates:** P0 owner split (§20); Gemini key and model on the team account (§6 lists stable candidates); submission portal and real cutoff (09:30 vs noon, §1); any live connector credential (§26). `git config user.name` still unset on this PC (set it to stop the skill guessing). Skill template in both `update-work-done/SKILL.md` copies says "all 10 P0 items"; blueprint §3.1 now has 11.
+**Blockers, open decisions, and needs from teammates:** P0 owner split (§20); Gemini key and model on the team account (§6 lists stable candidates); submission portal and real cutoff (09:30 vs noon, §1); any live connector credential (§26). Skill template in both `update-work-done/SKILL.md` copies says "all 10 P0 items"; blueprint §3.1 now has 11. Teammates: read `temp/PROJECT_B_ARCHITECTURE_SIMPLE.md` for a 10-minute overview.
 
 **Known broken / do not trust:** nothing implemented; all blueprint performance numbers are targets. `uplan-ai` facts in blueprint §1.1 come from a user-supplied report, unverified.
 
 ## Session log
+
+### Session 3: 2026-11-14 ~03:20-04:02 IST, flowchart review, simple architecture guide
+
+- **Branch:** `main`
+- **Start → end commit:** `a0f113e` → `f418738` (uncommitted changes: yes, `.claude/settings.json` only, intentional)
+- **Goal:** Check a pasted "simulated-tools prototype" prompt against the brief; review Adarsh's new flowchart against the blueprint; make the architecture easy for the team to understand.
+
+**Done**
+- Reviewed the pasted prompt (fabricated data + SQLite-backed simulated Gmail/Sheets/Calendar, one real connector later). Verdict: matches what blueprint line 11, §12 and §17 already decided. Its first milestone was missing the adaptive replan (P0 #8), mid-stream D1-D4, DEC-07, the knowledge graph and the six agents, so the blueprint stays the source of truth.
+- Reviewed `temp/PROJECT_B_SYSTEM_FLOWCHART.md` (Adarsh, `0f2edd8`) against the blueprint: no real conflicts, but too dense. Found 6 small gaps and fixed all of them in `f418738`:
+  - §1: a blocking preflight finding now returns to Planning (it had gone to Knowledge), and goes to partial once the replan budget is used up.
+  - §13: build order now copies blueprint §19.1.
+  - §12: UI panels 3 and 8 marked P1.
+  - §6: S1 execution order added (§11.4).
+  - §10: run state renamed to `rejected`.
+  - Gemini named as the live model.
+- Blueprint §14.4: added a `rejected` run status. Rejecting a v2 delta after some effects committed counts as `partial`.
+- New `temp/PROJECT_B_ARCHITECTURE_SIMPLE.md`: plain-language team guide. Has the 7-step flow, six agents as jobs, data stores, graph, D1-D4 table, 8 rules, approval, a single execution/reliability diagram, run states, glossary, and a map to the full docs. Every diagram has 10 boxes or fewer. The blueprint wins on any conflict.
+- Explained why `/update-work-done` is missing from the model's skill list: `disable-model-invocation: true` hides it on purpose, and the user can still run it.
+
+**Decisions and blueprint deviations**
+- The blueprint stays authoritative. The flowchart and the simple guide are companions, edited to match it.
+- DEVIATION from setup.md (`codex/<task>` branches): pushed docs straight to `main` again. Use task branches once code starts.
+
+**Verification**
+- `git push origin main` succeeded (`0f2edd8..f418738`); `git fetch` showed no newer remote commits first.
+- Mermaid diagrams not rendered or checked. No automated tests exist.
 
 ### Session 2: 2026-11-14 ~01:35-03:16 IST, blueprint revision 2, merge with Adarsh, push
 
