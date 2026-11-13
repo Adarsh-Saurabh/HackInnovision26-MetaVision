@@ -4,35 +4,72 @@ Read **Resume here** first. This is Ujjwal's file; teammates' files are in the s
 
 ## Resume here
 
-_Updated: 2026-11-14 03:10 IST by Ujjwal session 1. Commit `e4ac995` on `main`; uncommitted changes: `temp/PROJECT_B_BLUEPRINT.md` (revision 2), `.claude/`, `.agents/`, `CLAUDE.md`, `AGENTS.md`, `workDone/`, untracked `Screenshot 2026-11-14 013203.png`._
+_Updated: 2026-11-14 03:16 IST by Ujjwal session 2. Commit `85bb227` on `main` (in sync with `origin/main`); uncommitted changes: `.claude/settings.json` only (kept local on purpose: contains a machine-specific path)._
 
-**Working on:** session hand-off tooling (done). No implementation area assigned yet.
+**Working on:** blueprint is final for now (revision 2 merged with Adarsh's update, pushed). Next area: S1 fixtures and expected outcomes, §4/§17.
 
-**Next action:** Commit blueprint rev 2 and the hand-off files, then write S1 fixtures in `data/fixtures/` and hand-written `expected_outcomes.json` (blueprint §4, §17, §26 "Next task"), unless a teammate already owns that.
+**Next action:** Agree the P0 split with Adarsh and Vaibhav (§20, 3 people), then write `data/fixtures/` (incl. `scenarios.json`) and hand-written `expected_outcomes.json` for S1 exactly as in blueprint §4.1-§4.5 and §17.
 
-**Team P0 progress (§3.1)**, as known at this update
+**Team P0 progress (§3.1, now 11 items)**, as known at this update
 | # | Item | Status | Owner | Where / notes |
 |---|---|---|---|---|
-| 1 | Seed workspace from fixtures (simulated clock) | not started | | |
+| 1 | Seed workspace from fixtures (simulated clock `DEMO_NOW`) | not started | | `data/fixtures/` |
 | 2 | Communication: entity extraction with spans | not started | | |
 | 3 | Knowledge: resolve sponsor, context bundle, traversal incl. DEC-07 | not started | | |
-| 4 | Planning: mid-stream classification, versioned plan | not started | | |
-| 5 | Approval gate (LangGraph interrupt), three scopes | not started | | |
-| 6 | Execution with operation keys + fail-once tracker retry | not started | | |
-| 7 | Adaptive replan on concurrent D3 edit, delta re-approval | not started | | |
-| 8 | Verification read-back, summary, ledger, agent timeline | not started | | |
-| 9 | Replay source message: zero duplicate effects | not started | | |
-| 10 | Paused approval survives process restart | not started | | |
+| 4 | Planning: `EVT-*` rules, mid-stream classification, versioned plan | not started | | §11.2, §11.5 |
+| 5 | Verification preflight before approval | not started | | §11.5 |
+| 6 | Approval gate (LangGraph interrupt), three scopes | not started | | §13.2 |
+| 7 | Execution with operation keys + fail-once tracker retry | not started | | |
+| 8 | Adaptive replan on concurrent D3 edit, delta re-approval | not started | | §11.3 |
+| 9 | Verification read-back, summary, ledger, agent timeline | not started | | §15 |
+| 10 | Replay source message: zero duplicate effects | not started | | |
+| 11 | Paused approval survives process restart | not started | | |
 
-**Schedule (§19.2):** 03:10 IST is inside the 02:30-04:00 slot (deterministic S1 test should be in progress), but the 01:45-02:30 fixtures/schema/tools work has not started. Behind by ~1 slot. If still behind at 04:30, apply the §19.2 cuts (alias-only inferred edges, no live LLM until UI works).
+**Schedule (§19.2):** 03:16 IST, inside the 02:30-04:00 slot where the deterministic S1 test should already pass; no code exists. Behind by ~1.5 slots. If still behind at 04:30, apply §19.2 cuts (alias-only inferred edges, no live LLM until UI works); at 06:00, replan at pre-execution revalidation instead of mid-execution.
 
-**Run / test commands that work now:** none yet (no `pyproject.toml`, `uv.lock`, tests, or `app.py`).
+**Run / test commands that work now:** none yet (no `pyproject.toml`, `uv.lock`, tests, or `app.py`). Git: `git push origin main` works from this PC now (Git Credential Manager login done in the VS Code terminal).
 
-**Blockers, open decisions, and needs from teammates:** split P0 work across Ujjwal / Adarsh / Vaibhav (§20, team size now 3); Gemini key and model on the team account; submission portal and real cutoff (09:30 vs noon, §1); whether any live connector credential exists (§26). `git config user.name` is unset on this PC, so the skill will ask who is running it.
+**Blockers, open decisions, and needs from teammates:** P0 owner split (§20); Gemini key and model on the team account (§6 lists stable candidates); submission portal and real cutoff (09:30 vs noon, §1); any live connector credential (§26). `git config user.name` still unset on this PC (set it to stop the skill guessing). Skill template in both `update-work-done/SKILL.md` copies says "all 10 P0 items"; blueprint §3.1 now has 11.
 
-**Known broken / do not trust:** nothing implemented; all performance numbers in the blueprint are targets.
+**Known broken / do not trust:** nothing implemented; all blueprint performance numbers are targets. `uplan-ai` facts in blueprint §1.1 come from a user-supplied report, unverified.
 
 ## Session log
+
+### Session 2: 2026-11-14 ~01:35-03:16 IST, blueprint revision 2, merge with Adarsh, push
+
+- **Branch:** `main`
+- **Start → end commit:** `e4ac995` → `85bb227` (uncommitted changes: yes, `.claude/settings.json` only, intentional)
+- **Goal:** Review the blueprint against the highlighted Track B brief (`Screenshot 2026-11-14 013203.png`), research current APIs, fix and improve the blueprint, reconcile with Adarsh's parallel edit, push.
+
+**Done**
+- Reviewed `temp/PROJECT_B_BLUEPRINT.md` against the highlighted brief; found gaps on "multi-agent orchestration", "across email threads", "mid-stream", and "adaptive replanning" (was only P1).
+- Rewrote the blueprint as revision 2: replanning in P0 via an injected concurrent edit on D3 (§11.3); mid-stream deliverables D1-D4 with lifecycle status (§4.3, §11.2); second-order cascade via `DEC-07` contingent approval (§4.1, §4.4); multi-source evidence (email thread + team chat, §4.2); declared vs. inferred edges and bi-temporal facts (§9); `AgentMessage` handoff log and agent timeline (§7.2); simulated clock `DEMO_NOW` (§4.1); LangGraph interrupt rules (§13.2).
+- Merged Adarsh's `95be237` (uplan-ai lessons §1.1, `EVT-*` rules, `RuleFinding`, Verification preflight phase, compact context, `scenarios.json`, deferred connectors) into rev 2; added `EVT-DLV-001` and `EVT-DEC-001` for the new features (§11.5). P0 grew from 10 to 11 items (preflight is item 5).
+- Commits: `e57be24` (merged blueprint), `85bb227` (`AGENTS.md`, `CLAUDE.md`, `workDone/*.md`, both `update-work-done` skill copies, screenshot, `.gitignore` entry for `.claude/settings.local.json`). Both pushed to `origin/main`.
+
+**How**
+- Research: LangGraph interrupts docs (node re-runs from start on resume; `Command(resume=...)` same `thread_id`), PyPI `langgraph-checkpoint-sqlite` 3.1.3 (Oct 30 2026), Gemini models page (`gemini-2.5-flash` deprecated, routes to `gemini-3.5-flash-lite` from Dec 1), Graphiti for the bi-temporal pattern.
+- Conflict avoidance: `git fetch` + `git diff e4ac995 origin/main` instead of pulling; backed up both versions to the session scratchpad; built the merged file; `git checkout -- temp/PROJECT_B_BLUEPRINT.md`; `git pull --ff-only`; restored the merged file on top; committed. No merge conflict.
+
+**Decisions and blueprint deviations**
+- Deadline moved from Nov 14 08:00 to Nov 15 18:00 IST and all time logic uses `DEMO_NOW`: the old deadline is before the 10:00-12:00 presentations.
+- Approval node must be pure (no LLM call, no writes before `interrupt()`), because LangGraph re-runs the node on resume and a re-called model could change the plan hash.
+- Checkpoints and domain data in separate SQLite files; `check_same_thread=False` + WAL for Streamlit threads.
+- Business pending decisions (`decisions` table) kept separate from workflow approvals (`plan_approvals`).
+- Merge conflict resolved: Adarsh's "fresh baseline per scenario" kept, with S2 declared as the one exception (it starts from S1's verified end state to show long-term memory).
+- DEVIATION from setup.md §1/§7 (`codex/<task>` branches): pushed straight to `main`, matching how Adarsh pushed `95be237`.
+- `.claude/settings.json` not committed: contains `//c/Users/ujjwa/...` (setup.md forbids machine-specific paths).
+
+**Problems / dead ends**
+- Push from the agent shell failed: `fatal: could not read Username for 'https://github.com': terminal prompts disabled`. `! git push` from chat failed the same way. Fixed by running `git push origin main` in the VS Code terminal (Git Credential Manager browser login); later pushes worked from the agent shell.
+- WebFetch of the LangGraph durable-execution page returned the persistence page; used the official-doc search summary instead.
+- Session 1 (hand-off tooling) ran in a parallel conversation during this session's time window; its entry predates these commits.
+
+**Verification**
+- `git status -sb` → `## main...origin/main` (in sync) at `85bb227`.
+- Grep of the merged blueprint confirmed Adarsh's items present (`EVT-SRC-001`, `RuleFinding`, `scenarios.json`, `PyMuPDF`, "Prototype scope, confirmed") alongside rev 2 items.
+- Scenario arithmetic checked by hand: S1 250k → 210k vs 220k expenses = −10k; S2 Brightline +10k → balance 0, DEC-07 still blocked.
+- No automated tests (none exist yet).
 
 ### Session 1: 2026-11-14 ~02:45-03:10 IST, session hand-off tooling
 
