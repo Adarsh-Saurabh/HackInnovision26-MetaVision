@@ -77,6 +77,7 @@ class Store:
         self._sources: dict[str, dict] = {}
         self._evidence: dict[str, dict] = {}
         self._active: list[str] = []
+        self._allowed: set[str] = set()
         self.graph_nodes: list[dict] = []
         self.graph_edges: list[dict] = []
 
@@ -103,6 +104,8 @@ class Store:
         store._evidence = {e["evidence_id"]: e for e in src["evidence"]}
         dep = _load(fx, "dependencies.json")
         store.graph_nodes, store.graph_edges = dep["nodes"], dep["edges"]
+        store._allowed = set(store.scenario["available_source_ids"]) - set(
+            store.scenario["privacy"]["denied_source_ids"])
         # Baseline-phase sources are visible from the start; trigger arrives via deliver().
         for act in sorted(store.scenario["activation"], key=lambda a: a["order"]):
             if act["phase"] == "baseline":
@@ -163,8 +166,12 @@ class Store:
     # ---------- sources ----------
     def deliver(self, source_id: str) -> bool:
         """Deliver a message. Returns False (no effect) for a duplicate of an already-seen message."""
+        if source_id not in self._allowed:
+            self.log("Coordinator", f"Delivery of {source_id} refused: not in this scenario's allowed sources",
+                     "blocked")
+            return False
         src = self._sources[source_id]
-        dup = self.db.execute("SELECT 1 FROM deliveries WHERE source_id=? AND content_hash=? AND duplicate=0",
+        dup =self.db.execute("SELECT 1 FROM deliveries WHERE source_id=? AND content_hash=? AND duplicate=0",
                               (source_id, src["content_hash"])).fetchone() is not None
         dup = dup or source_id in self._active
         self.db.execute("INSERT INTO deliveries (source_id,content_hash,duplicate,at) VALUES (?,?,?,?)",
