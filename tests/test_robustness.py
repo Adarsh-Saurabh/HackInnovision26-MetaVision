@@ -22,6 +22,24 @@ def _to_approval(wf: Workflow) -> Workflow:
     return wf
 
 
+def test_progress_display_failure_does_not_interrupt_the_workflow(caplog):
+    wf = Workflow(inject_faults=False)
+
+    def broken_display(entry):
+        raise RuntimeError("display disconnected")
+
+    wf.store.on_log = broken_display
+    with caplog.at_level("ERROR", logger="second_brain.storage"):
+        wf.ingest()
+        wf.analyze()
+        wf.approve()
+        wf.execute()
+        assert wf.verify()["ok"]
+    assert wf.stage == "verified"
+    assert "Progress display failed; workflow continues" in caplog.text
+    wf.close()
+
+
 def _run_until_delta(wf: Workflow, scopes=BOTH) -> Workflow:
     _to_approval(wf)
     wf.approve(scopes)
