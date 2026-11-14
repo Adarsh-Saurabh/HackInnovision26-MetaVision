@@ -4,16 +4,16 @@ Read **Resume here** first. This is Ujjwal's file; teammates' files are in the s
 
 ## Resume here
 
-_Updated: 2026-11-14 04:02 IST by Ujjwal session 3. Commit `f418738` on `main` (pushed, in sync with `origin/main`); uncommitted changes: `.claude/settings.json` only (kept local on purpose: contains a machine-specific path)._
+_Updated: 2026-11-14 05:58 IST by Ujjwal session 4. Commit after `a13e7c8` on `main` (this update, `API.md`, `.env.example` pushed together); uncommitted: `.claude/settings.json` only (machine-specific path). Local `.env` holds the Gemini key and is git-ignored._
 
-**Working on:** planning docs are now consistent: the blueprint, Adarsh's flowchart (`temp/PROJECT_B_SYSTEM_FLOWCHART.md`) and the new plain-language guide (`temp/PROJECT_B_ARCHITECTURE_SIMPLE.md`). Next area: S1 fixtures and expected outcomes, §4/§17.
+**Working on:** blueprint rev 2.1 robustness design (§8.1, §9.2, §10.1-§10.4, §12.2-§12.4, §13.3, §14.5) now aligned with Adarsh's frozen fixtures in `data/fixtures/`. Gemini key tested; setup in `API.md`.
 
-**Next action:** Agree the P0 split with Adarsh and Vaibhav (§20, 3 people), then write `data/fixtures/` (incl. `scenarios.json`) and hand-written `expected_outcomes.json` for S1 exactly as in blueprint §4.1-§4.5 and §17. No more planning-doc work before code.
+**Next action:** Agree the P0 split (§20), then `uv init` + `uv add` per §21 and write `second_brain/storage.py` that seeds SQLite from `data/fixtures/` (§19.1 step 2), starting with `S1-main-demo`. No more planning-doc work before code.
 
-**Team P0 progress (§3.1, now 11 items)**, as known at this update
+**Team P0 progress (§3.1, 11 items)**, as known at this update
 | # | Item | Status | Owner | Where / notes |
 |---|---|---|---|---|
-| 1 | Seed workspace from fixtures (simulated clock `DEMO_NOW`) | not started | | `data/fixtures/` |
+| 1 | Seed workspace from fixtures (simulated clock `DEMO_NOW`) | in progress (fixtures done + validated, loader not started) | Adarsh (fixtures) | `data/fixtures/`, `python -B data/fixtures/validate.py` PASS |
 | 2 | Communication: entity extraction with spans | not started | | |
 | 3 | Knowledge: resolve sponsor, context bundle, traversal incl. DEC-07 | not started | | |
 | 4 | Planning: `EVT-*` rules, mid-stream classification, versioned plan | not started | | §11.2, §11.5 |
@@ -25,15 +25,48 @@ _Updated: 2026-11-14 04:02 IST by Ujjwal session 3. Commit `f418738` on `main` (
 | 10 | Replay source message: zero duplicate effects | not started | | |
 | 11 | Paused approval survives process restart | not started | | |
 
-**Schedule (§19.2):** 04:02 IST, end of the 02:30-04:00 slot where the deterministic S1 test should already pass; still no code (no fixtures, no `pyproject.toml`). Behind by ~2 slots. At 04:30 apply §19.2 cuts (alias-only inferred edges, no live LLM until UI works); at 06:00, replan at pre-execution revalidation instead of mid-execution.
+**Schedule (§19.2):** 05:58 IST, end of the 04:30-06:00 slot (LangGraph agents, checkpoint, approval, retry). Only fixtures exist; no app code or `pyproject.toml`. Behind ~3 slots. Apply §19.2 cuts now: alias-only inferred edges, no live LLM until UI works, replan at pre-execution revalidation instead of mid-execution, edge table instead of graph rendering.
 
-**Run / test commands that work now:** none yet (no `pyproject.toml`, `uv.lock`, tests, or `app.py`). Git: `git push origin main` works from the agent shell.
+**Run / test commands that work now:** `python -B data/fixtures/validate.py` (PASS), `python -B data/fixtures/validate.py --self-test`. Gemini key check: see `API.md` §3. No app/tests yet.
 
-**Blockers, open decisions, and needs from teammates:** P0 owner split (§20); Gemini key and model on the team account (§6 lists stable candidates); submission portal and real cutoff (09:30 vs noon, §1); any live connector credential (§26). Skill template in both `update-work-done/SKILL.md` copies says "all 10 P0 items"; blueprint §3.1 now has 11. Teammates: read `temp/PROJECT_B_ARCHITECTURE_SIMPLE.md` for a 10-minute overview.
+**Blockers, open decisions, and needs from teammates:** P0 owner split (§20); submission portal and real cutoff (09:30 vs noon, §1). Gemini key resolved: share privately (not Git), each person copies `.env.example` to `.env`. The fixtures mark 19 scenarios P0: test priorities, not demo requirements; build `S1-main-demo` first (§26). Skill template still says "all 10 P0 items"; §3.1 has 11.
 
-**Known broken / do not trust:** nothing implemented; all blueprint performance numbers are targets. `uplan-ai` facts in blueprint §1.1 come from a user-supplied report, unverified.
+**Known broken / do not trust:** nothing implemented; blueprint numbers are targets. Fixture validator passing proves static consistency only, not any workflow. `uplan-ai` facts in §1.1 unverified. Gemini key is now in this session's chat transcript; rotate it if that transcript is shared.
 
 ## Session log
+
+### Session 4: 2026-11-14 ~04:10-05:58 IST, robustness design (rev 2.1), fixtures merge, Gemini key
+
+- **Branch:** `main`
+- **Start → end commit:** `15b9d95` → `a13e7c8` + this commit (uncommitted changes: yes, `.claude/settings.json` only, intentional)
+- **Goal:** Answer nine robustness questions (memory, tool/agent failure, sensitive data, PDFs, chat filtering, cross-tool priority, value mismatch, conflicting sponsor employees), compare with another agent's prompt, write the result into the blueprint and a team page; check Adarsh's dataset against the plan; set up the Gemini key.
+
+**Done**
+- Blueprint revision 2.1 (`a13e7c8`): claim lifecycle §8.1; memory layers + promotion gate §9.2; new tables §9.3 (`sensitive_vault`, `conflicts`, `connector_health`, `document_chunks`, `sync_cursors`, `channel_identities`); §10.1 ingestion funnel, §10.2 identity/authority, §10.3 cross-channel precedence, §10.4 system of record + conflict tree; §11.5 `EVT-CON-001`, `EVT-PII-001`; §12.2 live-adapter table, §12.3 outbox/circuit breaker, §12.4 PDF pipeline; §13.3 sensitive data; §14.5 agent/model failure; §17/§18/§25.2/§26 updates.
+- Team page (private claude.ai artifact, "Second Brain robustness design"): https://claude.ai/artifact/FadPup7YhiK699QiT8n797. Share from its Share menu.
+- Merged Adarsh's `codex/synthetic-fixtures` (`d1823f2`) into `main` as `8148e89`; it only adds `data/fixtures/` (10 JSON files, README, `validate.py`; 24 scenarios).
+- Aligned rev 2.1 with the fixtures: §10.3 channel ranking applies only to the same author; two authorized people disagreeing → `contested` (`S1-authorized-conflict`, Priya 60k email vs Neil 80k WhatsApp). P0 privacy = whole-source denial (`S1-privacy-scope`); quote stripping and field-level pseudonymization moved to P1 on new sources. Contacts' `authority: commitment_contact` counts as commitment scope.
+- `API.md` (setup, models, PowerShell test, `google-genai` structured-output snippet, rules; no key), `.env.example` (placeholders), local `.env` with the key (git-ignored, verified with `git check-ignore`).
+
+**How**
+- One mechanism for most questions: source → claim → deterministic resolver → proposed change or conflict → only approved + read-back-verified claims become facts.
+- Fixtures fetched with `git fetch`; three-dot diff showed the branch only adds `data/fixtures/` (it was cut from `0f2edd8`, so two-dot diff wrongly suggested deletions). Copied with `git restore --source`, compared byte-for-byte, then merged with `--no-ff`.
+- Gemini: `GET /v1beta/models` with `x-goog-api-key` header; `generateContent` with `responseSchema` on `gemini-3.5-flash-lite` and `gemini-3.6-flash`.
+
+**Decisions and blueprint deviations**
+- Gemini key kept out of Git (repo is on GitHub); shared privately. `MODEL_NAME` default `gemini-3.5-flash-lite`.
+- Gmail live adapter: dedupe with stored draft ID + custom `X-SecondBrain-Op` header, not a custom `Message-ID` (developer reports say Gmail replaces it on API sends).
+- Rev 2.1 items that conflicted with the frozen fixtures were changed in the blueprint, not in the fixtures (fixtures carry content hashes and spans).
+- DEVIATION from setup.md (`codex/<task>` branches): merged and pushed straight to `main` again.
+
+**Problems / dead ends**
+- `git pull` on `main` brought nothing: the dataset was on a separate branch.
+- Found an internal contradiction in my own rev 2.1 §10.3 (email outranking chat between two different people) through the fixture review; fixed.
+
+**Verification**
+- `python -I data/fixtures/validate.py` → PASS (10 JSON files, 24 scenarios, 26 sources, 45 evidence, 46 nodes, 38 edges); validator states workflow checks NOT RUN.
+- Gemini: model list returned (includes `gemini-3.5-flash-lite`, `gemini-3.6-flash`, `gemini-3.8-flash`); structured output returned `{"sponsor":"Aster Labs","old_inr":100000,"new_inr":60000}` on both tested models (71 and 439 tokens).
+- No app tests exist.
 
 ### Session 3: 2026-11-14 ~03:20-04:02 IST, flowchart review, simple architecture guide
 
