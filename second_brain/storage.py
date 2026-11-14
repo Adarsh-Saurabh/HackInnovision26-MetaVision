@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import copy
 import json
+import logging
 import sqlite3
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from collections.abc import Callable
 
 FIXTURES_DIR = Path(__file__).resolve().parent.parent / "data" / "fixtures"
 
@@ -81,6 +83,7 @@ class Store:
         self._allowed: set[str] = set()
         self.graph_nodes: list[dict] = []
         self.graph_edges: list[dict] = []
+        self.on_log: Callable[[dict], None] | None = None
 
     # ---------- seeding ----------
     @classmethod
@@ -235,10 +238,17 @@ class Store:
 
     # ---------- action log ----------
     def log(self, agent: str, message: str, kind: str = "info", data: dict | None = None) -> None:
+        entry = {"at": _now(), "agent": agent, "kind": kind, "message": message, "data": data}
         self.db.execute("INSERT INTO log (at,agent,kind,message,data) VALUES (?,?,?,?,?)",
-                        (_now(), agent, kind, message,
+                        (entry["at"], agent, kind, message,
                          json.dumps(data, ensure_ascii=False, default=str) if data else None))
         self.db.commit()
+        if self.on_log:
+            try:
+                self.on_log(entry)
+            except Exception:
+                # A progress display must never interrupt a committed business operation.
+                logging.getLogger(__name__).exception("Progress display failed; workflow continues")
 
     def logs(self) -> list[dict]:
         rows = self.db.execute("SELECT * FROM log ORDER BY seq").fetchall()

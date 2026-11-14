@@ -103,7 +103,7 @@ def test_every_tab_renders_after_full_path():
     at = full_path(start())
     assert len(at.tabs) >= 6 + 7
     assert len(at.dataframe) > 0
-    assert len(at.get("graphviz_chart")) == 1
+    assert len(at.get("graphviz_chart")) == 2
     assert len(at.get("json")) >= 1          # replay result in Verification tab
     captions = [c.value for c in at.caption]
     assert "Run the agents to see the impact graph." not in captions
@@ -125,3 +125,109 @@ def test_reset_midway_returns_to_ready():
 
 def test_no_deprecated_use_container_width():
     assert "use_container_width" not in Path(APP).read_text(encoding="utf-8")
+
+
+def select_scenario(at: AppTest, scenario: str) -> AppTest:
+    at.selectbox(key="scenario").select(scenario).run()
+    assert not at.exception, at.exception
+    assert stage(at) == "ready"
+    assert at.session_state.wf.store.effect_count() == 0
+    click(at, "Deliver")
+    click(at, "Run the agents")
+    return at
+
+
+def test_two_authorised_contacts_pause_with_evidence_and_no_writes():
+    at = select_scenario(start(), "S1-authorized-conflict")
+    assert stage(at) == "needs_clarification"
+    assert at.session_state.wf.store.effect_count() == 0
+    assert at.session_state.wf.plan is None
+    assert any("Human attention required" in w.value for w in at.warning)
+    text = " ".join(x.value for x in at.markdown)
+    assert "Neil" in text and "INR 80,000" in text and "INR 60,000" in text
+    assert not any("Approve as organiser" in b.label for b in at.button)
+    assert "Human clarification" in str(at.get("graphviz_chart")[0].proto)
+
+
+def test_sponsor_confirmation_resumes_through_fresh_approval():
+    at = select_scenario(start(), "S1-conflict-clarified")
+    assert stage(at) == "needs_clarification"
+    click(at, "Deliver sponsor confirmation")
+    assert stage(at) == "awaiting_approval"
+    assert at.session_state.wf.store.effect_count() == 0
+    assert at.session_state.wf.trigger_id == "mail-aster-clarification"
+    assert at.session_state.wf.store.on_log is None
+    for label in ("Approve as organiser", "Execute approved", "Verify"):
+        click(at, label)
+    assert stage(at) == "verified"
+    assert any("business decisions remain open" in w.value for w in at.warning)
+
+
+@pytest.mark.parametrize("scenario", ["S1-approved", "S1-unauthorized-whatsapp", "S1-tracker-failure",
+                                     "S1-timeout-after-write"])
+def test_selected_workflow_completes_and_shows_recovery(scenario):
+    at = select_scenario(start(), scenario)
+    assert stage(at) == "awaiting_approval"
+    for label in ("Approve as organiser", "Execute approved", "Verify", "Replay"):
+        click(at, label)
+    wf = at.session_state.wf
+    assert wf.stage == "verified"
+    assert wf.replay_result["new_effects"] == 0
+    assert "Verified result" in str(at.get("graphviz_chart")[0].proto)
+    if scenario == "S1-tracker-failure":
+        assert any("Confirmed outcome" in x.value and "2 attempt(s)" in x.value for x in at.markdown)
+    if scenario == "S1-timeout-after-write":
+        assert any("confirmed by read-back; no repeated write" in x.value for x in at.markdown)
+
+
+@pytest.mark.parametrize("scenario", ["S1-gmail-unavailable", "S1-privacy-agent-failure"])
+def test_failed_source_or_privacy_gate_is_visible_and_blocks_planning(scenario):
+    at = select_scenario(start(), scenario)
+    assert stage(at) == "blocked"
+    assert at.session_state.wf.store.effect_count() == 0
+    assert any("Human attention required" in e.value for e in at.error)
+    assert "Human investigation" in str(at.get("graphviz_chart")[0].proto)
+
+
+def test_switching_scenarios_clears_previous_plan_and_approvals():
+    at = start()
+    for label in ("Deliver", "Run the agents", "Approve as organiser"):
+        click(at, label)
+    at.selectbox(key="scenario").select("S1-authorized-conflict").run()
+    assert not at.exception
+    assert stage(at) == "ready"
+    assert at.session_state.wf.plan is None
+    assert at.session_state.wf.approvals == []
+
+
+def test_live_graph_highlights_real_agents_and_current_record(monkeypatch):
+    import streamlit as st
+    from streamlit.delta_generator import DeltaGenerator
+
+    diagrams = []
+    original_chart = st.graphviz_chart
+    original_placeholder_chart = DeltaGenerator.graphviz_chart
+
+    def capture_chart(dot, **kwargs):
+        diagrams.append(dot)
+        return original_chart(dot, **kwargs)
+
+    monkeypatch.setattr(st, "graphviz_chart", capture_chart)
+
+    def capture_placeholder_chart(self, dot, **kwargs):
+        diagrams.append(dot)
+        return original_placeholder_chart(self, dot, **kwargs)
+
+    monkeypatch.setattr(DeltaGenerator, "graphviz_chart", capture_placeholder_chart)
+    at = start()
+    click(at, "Deliver")
+    click(at, "Run the agents")
+    for agent in ("Communication", "Knowledge", "Planning"):
+        assert any(f'{agent}\\nActive' in dot for dot in diagrams)
+    click(at, "Approve as organiser")
+    click(at, "Execute approved")
+    assert stage(at) == "awaiting_delta_approval"
+    assert any("Execution\\nActive" in dot for dot in diagrams)
+    assert at.session_state.wf.store.on_log is None
+    assert any("current operation" in dot and "sponsor-aster" in dot for dot in diagrams)
+    assert "Human approval\\nCurrent" in at.get("graphviz_chart")[0].proto.spec
