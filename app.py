@@ -252,7 +252,8 @@ with left:
                         f'{src["occurred_at"][:16].replace("T", " ")}<br><br>{html.escape(src["body"])}</div>',
                         unsafe_allow_html=True)
             if st.button("🧠 Run the agents", type="primary", width="stretch"):
-                run_step(wf.analyze)
+                with st.spinner("Agents reading the message and tracing the impact…"):
+                    run_step(wf.analyze)
         elif stage == "awaiting_approval":
             p = wf.plan
             st.subheader(f"3 · Plan v1 needs your approval ({len(p['actions'])} actions)")
@@ -263,6 +264,8 @@ with left:
             elif info["status"] == "agree":
                 st.caption(f"✨ Read by Gemini `{info['model']}`, checked against the message text and the "
                            "rule-based extraction: they agree")
+            elif info["status"] == "skipped":
+                st.caption("🔒 Gemini skipped (sender not verified); rule-based extraction used")
             else:
                 st.caption(f"⚠️ Gemini result not used ({info['status']}); grounded rule-based extraction kept")
             for f in p["flags"]:

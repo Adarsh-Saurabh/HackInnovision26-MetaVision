@@ -9,6 +9,7 @@ falls back to rules. One call per run, with a timeout. API key comes from .env o
 from __future__ import annotations
 
 import os
+import re
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -61,16 +62,25 @@ def gemini_extract(body: str) -> CommitmentChange:
     return parsed
 
 
+def _numbers(body: str) -> set[int]:
+    """Every whole number written in the text, with any digit grouping (100,000 or 1,00,000)."""
+    return {int(tok.replace(",", "")) for tok in re.findall(r"\d+(?:,\d+)*", body)}
+
+
 def _in_text(amount: int | None, body: str) -> bool:
-    return amount is not None and (f"{amount:,}" in body or str(amount) in body)
+    """Exact whole-number match only: 60 must not match inside '60,000' or '160,000'."""
+    return amount is not None and amount in _numbers(body)
 
 
-def cross_check(store, proposal: dict, extractor=gemini_extract) -> dict:
+def cross_check(store, proposal: dict, extractor=None) -> dict:
     """Run Gemini on the trigger message and reconcile it with the rule-based proposal."""
-    src = store.source(proposal["source_id"])
-    if src is None:
-        return proposal
+    extractor = extractor or gemini_extract  # looked up at call time so tests can block it
     model = model_name()
+    src = store.source(proposal["source_id"])
+    if src is None or not proposal.get("authorized"):
+        # Never send text from an unverified sender (or an invisible source) to an external model.
+        store.log("Communication", "Live Gemini skipped: sender not verified or source not visible", "info")
+        return {**proposal, "llm": {"model": model, "status": "skipped"}}
     store.log("Communication", f"Live mode: asking Gemini ({model}) to interpret {proposal['source_id']}", "llm")
     got, last_exc = None, None
     for attempt in range(1, MAX_CALLS + 1):  # bounded: at most MAX_CALLS calls per run
@@ -87,15 +97,21 @@ def cross_check(store, proposal: dict, extractor=gemini_extract) -> dict:
         return {**proposal, "llm": {"model": model, "status": "error", "error": type(last_exc).__name__}}
 
     body = src["body"]
+    name = got.sponsor_name.strip()
+    deadline = (got.deadline_phrase or "").strip()
+    rule_old = proposal.get("old_paise")
     grounded = {
-        "sponsor named in message": got.sponsor_name.lower() in body.lower(),
+        "sponsor named in message": bool(name) and name.lower() in body.lower(),
         "new amount appears in message": _in_text(got.new_amount_inr, body),
         "old amount appears in message": got.old_amount_inr is None or _in_text(got.old_amount_inr, body),
+        "deadline wording appears in message": not deadline or deadline.lower() in body.lower(),
         "currency is INR": got.currency.strip().upper() in ("INR", "RUPEES", "₹"),
     }
     agrees = {
+        "sponsor matches rules": name.lower() == str(proposal.get("sponsor_name", "")).lower(),
         "new amount matches rules": got.new_amount_inr * 100 == proposal["new_paise"],
-        "old amount matches rules": got.old_amount_inr is None or got.old_amount_inr * 100 == proposal["old_paise"],
+        "old amount matches rules": (got.old_amount_inr is None) == (rule_old is None)
+        and (rule_old is None or got.old_amount_inr * 100 == rule_old),
         "firm request": got.is_firm_request,
     }
     failed = [k for k, ok in {**grounded, **agrees}.items() if not ok]

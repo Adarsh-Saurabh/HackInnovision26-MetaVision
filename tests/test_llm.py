@@ -44,3 +44,35 @@ def test_api_error_falls_back_to_rules():
 def test_workflow_default_makes_no_llm_calls():
     wf = Workflow().run_scripted()
     assert wf.use_llm is False and "llm" not in wf.proposal and wf.stage == "verified"
+
+
+def test_partial_number_is_not_grounded():
+    from second_brain.llm import _in_text
+    body = "from INR 100,000 to INR 60,000."
+    assert _in_text(60000, body) and _in_text(100000, body)
+    assert not _in_text(60, body) and not _in_text(6000, body) and not _in_text(0, body)
+
+
+def test_indian_grouping_and_superstrings():
+    from second_brain.llm import _in_text
+    assert _in_text(600000, "INR 6,00,000 now") and not _in_text(60000, "INR 160,000")
+
+
+def test_wrong_sponsor_or_missing_old_amount_rejected():
+    store, prop = _proposal()
+    assert cross_check(store, prop, _fake(sponsor_name="Brightline Foods"))["llm"]["status"] == "disagree"
+    assert cross_check(store, prop, _fake(old_amount_inr=None))["llm"]["status"] == "disagree"
+    assert cross_check(store, prop, _fake(sponsor_name=""))["llm"]["status"] == "disagree"
+    assert cross_check(store, prop, _fake(deadline_phrase="by Friday"))["llm"]["status"] == "disagree"
+
+
+def test_unverified_sender_text_never_sent():
+    store, prop = _proposal()
+    calls = []
+    out = cross_check(store, {**prop, "authorized": False}, lambda b: calls.append(b))
+    assert out["llm"]["status"] == "skipped" and calls == []
+
+
+def test_network_guard_blocks_real_calls():
+    store, prop = _proposal()
+    assert cross_check(store, prop)["llm"]["status"] == "error"   # conftest blocks gemini_extract

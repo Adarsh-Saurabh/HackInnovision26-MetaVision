@@ -66,7 +66,7 @@ class Workflow:
     def analyze(self) -> dict:
         self._require("ingested")
         self.proposal = communication_agent(self.store, self.trigger_id)
-        if self.use_llm:
+        if self.use_llm and self.proposal.get("authorized"):
             from .llm import cross_check
             self.proposal = cross_check(self.store, self.proposal)
         if not self.proposal.get("authorized"):
