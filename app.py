@@ -266,7 +266,9 @@ with left:
                 run_step(wf.execute)
         elif stage == "awaiting_delta_approval":
             p = wf.plan
-            n_new = sum(v == "needs_approval" for v in wf.delta.values())
+            v1_scopes = wf.approvals[0]["scopes"] if wf.approvals else ["business_records", "internal_notifications"]
+            n_new = sum(1 for a in p["actions"] if wf.delta.get(a["op_key"]) == "needs_approval"
+                        and a["scope"] in v1_scopes)
             st.subheader("5 · The world changed mid-run: plan v2")
             st.error("Rohan published D3 directly in the social tool while we were about to cancel it. "
                      "Our write was refused (version conflict), nothing was overwritten, and the agents "
@@ -278,7 +280,7 @@ with left:
             st.dataframe(plan_rows(p, True), hide_index=True, width="stretch")
             b1, b2 = st.columns([3, 1])
             if b1.button(f"✅ Approve {n_new} changed actions", type="primary", width="stretch"):
-                run_step(wf.approve_delta)
+                run_step(wf.approve_delta, v1_scopes)
             if b2.button("Reject v2", width="stretch"):
                 run_step(wf.reject)
         elif stage == "executed":
