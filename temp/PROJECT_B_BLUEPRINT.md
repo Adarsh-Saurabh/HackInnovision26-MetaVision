@@ -1,6 +1,6 @@
 # MetaVision: Project B / Second Brain - hackathon blueprint
 
-Revision 2, November 14, 2026 (~01:45 IST), for HackInnovision 2026, Track B.
+Revision 2.1, November 14, 2026 (revision 2 at ~01:45 IST; 2.1 adds the robustness design), for HackInnovision 2026, Track B.
 
 **Status:** design and implementation plan. Nothing below is implemented yet. Performance numbers are targets, not results.
 
@@ -25,6 +25,23 @@ Revision 2, November 14, 2026 (~01:45 IST), for HackInnovision 2026, Track B.
 9. Schema fixes (`source_id` vs. `event_id`, `deadline`, `requested_deliverables`), `uv sync --locked`, current LangGraph/Gemini API notes.
 10. Removed duplicated setup instructions (see [setup.md](../setup.md)) and condensed repetitive caveats.
 11. Merged Adarsh's update: uplan-ai lessons (§1.1), deterministic `EVT-*` rules with `RuleFinding` and a Verification preflight phase (§11.5), compact-context rule (§10), fabricated dataset with `scenarios.json` (§17), live connectors deferred (§12).
+
+### What changed in revision 2.1
+
+Robustness design for nine team questions: memory use, tool failure, agent failure, sensitive data, large PDFs, chat filtering, cross-tool priority, value mismatches, and conflicting sponsor employees. One mechanism answers most of them: every statement becomes a **claim**; deterministic rules turn it into a proposed change or a **conflict**; only approved and verified changes become **facts**.
+
+1. Claim lifecycle (§8.1); memory layers and promotion gate (§9.2).
+2. Ingestion funnel with quote stripping and a relevance filter (§10.1).
+3. Identity across channels, per-field authority scopes, delegation, payment-detail guard (§10.2).
+4. Deterministic precedence across channels; binding-channel rule for money (§10.3).
+5. System of record per field, amount normalization, conflict decision tree (§10.4).
+6. Live-adapter contract per tool, outbox, circuit breaker, inbound backfill (§12.2-§12.3).
+7. Document and large-PDF pipeline (§12.4).
+8. Sensitive-data gates: detect, pseudonymize, block egress (§13.3).
+9. Agent and model failure modes; fail-closed rule (§14.5).
+10. Rules `EVT-CON-001` and `EVT-PII-001`; `EVT-SRC-001` extended (§11.5). New scenarios, tests, and judge answers (§17, §18, §25.2).
+
+P0 stays at 11 items. Three small additions fold into P0 items 2, 3, and 9: whole-source privacy denial, the authority check, and the promotion gate. Quote stripping and field-level pseudonymization are P1, because the frozen fixtures in `data/fixtures/` (contract `metavision-fixtures/1`) do not contain those cases. Everything else is P1 (§3.2) or roadmap (§3.4).
 
 ## Contents
 
@@ -131,25 +148,29 @@ Show a second scenario (different sponsor, opposite direction) to prove behavior
 ### 3.1 P0: required end-to-end demo
 
 1. Seed a synthetic workspace from fixtures: email thread, team chat, sponsorship tracker, budget sheet, calendar, documents, policies, pending decisions. Use the simulated clock.
-2. **Communication:** extract entities (sponsor, amount, currency, deadline, requested deliverables, sender) with source spans into validated schemas.
-3. **Knowledge:** resolve sponsor via contact/alias tables; build a context bundle; traverse declared edges plus deterministic alias-match inferred edges ("P0-lite" inference); include the second-order cascade.
+2. **Communication:** extract entities (sponsor, amount, currency, deadline, requested deliverables, sender) with source spans into validated schemas. Sources a scenario denies (`privacy.denied_source_ids`) never reach any agent context, model call, or outgoing message (whole-source denial, §13.3).
+3. **Knowledge:** resolve sponsor via contact/alias tables and check the sender's authority for the changed field (§10.2; in the fixtures, `authority: commitment_contact` grants the commitment scope); build a context bundle; traverse declared edges plus deterministic alias-match inferred edges ("P0-lite" inference); include the second-order cascade.
 4. **Planning:** evaluate deterministic `EVT-*` rules; classify each affected deliverable by lifecycle status (update / cancel / already satisfied / irreversible → human decision); produce a versioned plan with exact diffs, deficit, and at-risk contingent approvals.
 5. **Preflight review** by the Verification agent before the human sees the plan; blocking findings return to Planning.
 6. **Approval gate** (LangGraph interrupt) before any business write, with separate scopes for business records, internal notifications, and sponsor-facing send.
 7. **Execution** with durable operation keys; one injected fail-once transient tracker failure recovered by bounded retry.
 8. **Adaptive replan:** injected concurrent teammate edit causes a version conflict mid-execution → plan v2 for the remaining actions only → re-approval of the delta → resume without repeating committed effects.
-9. **Verification** by independent read-back predicates; final summary, action ledger, and agent handoff timeline.
+9. **Verification** by independent read-back predicates; only verified effects are promoted to current facts (§9.2); final summary, action ledger, and agent handoff timeline.
 10. Replay the source message: zero duplicate effects.
 11. A run paused at approval survives a process restart.
 
 ### 3.2 P1: after P0 is reliable
 
 - Scenario 2 with visible long-term memory recall from run 1 (§17).
-- Contradictory authorized messages scenario.
+- Priya (email, INR 60,000) and Neil (WhatsApp, INR 80,000) disagree (`S1-authorized-conflict`, `S1-conflict-clarified`): `contested` claims, a `conflicts` row, clarification draft, no financial write until an explicit follow-up and approval (§10.4).
+- Quote stripping and field-level pseudonymization with the egress gate, on new fixture sources added without editing frozen ones (§10.1, §13.3).
+- Cross-channel revision: the authorized contact revises the amount in team chat after email → binding-channel rule, confirmation draft (§10.3).
+- Model outage fault: fallback extraction and human value confirmation (§14.5).
+- Permanent calendar outage → connector circuit breaker, outbox wait, fallback plan (tracker reminder task) requiring approval (§12.3).
+- Knowledge-graph visualization and evidence inspector.
+- Small synthetic contract PDF (about 3 pages, text layer): page-cited claims, hash dedupe on resend (§12.4).
 - LLM-proposed inferred edges (validated by span check) beyond alias matching.
 - Editable approval producing a new plan version.
-- Knowledge-graph visualization and evidence inspector.
-- Permanent calendar outage → fallback plan (tracker reminder task) requiring approval.
 - Downloadable run report.
 - One live connector (test Google Sheet) only if credentials already exist.
 
@@ -159,7 +180,7 @@ Second live connector, single-agent baseline comparison on the same cases, compe
 
 ### 3.4 Excluded
 
-Kubernetes, microservices, Redis/Celery, fine-tuning, local GPU serving, vector database, graph database server (including Graphiti/Neo4j), autonomous browsing, real WhatsApp/Slack integration, payments, multi-tenant permissions, a second orchestration framework alongside LangGraph.
+Kubernetes, microservices, Redis/Celery, fine-tuning, local GPU serving, vector database, graph database server (including Graphiti/Neo4j), autonomous browsing, real WhatsApp/Slack integration, OCR, encryption at rest for the sensitive vault, payments, multi-tenant permissions, a second orchestration framework alongside LangGraph. Live-adapter behavior is designed in §12.2-§12.3 so the roadmap answer is concrete; it is not built.
 
 ## 4. Demo scenario and business rules
 
@@ -202,6 +223,8 @@ Pending organizer decisions (business records, not workflow approvals):
 | `doc-run-sheet` | Docs | — | Stage run sheet containing the Aster stage mention |
 
 "Tomorrow" resolves from the source timestamp → deadline `2026-11-15T18:00:00+05:30`.
+
+The fixtures are built: see [data/fixtures/README.md](../data/fixtures/README.md) (24 scenarios, validated by `python -B data/fixtures/validate.py`). Sources are frozen with content hashes and evidence offsets; `mail-aster-002` contains no quoted text or sensitive values. Quote-stripping and pseudonymization cases (P1) need new, separate sources; never edit a frozen source.
 
 ### 4.3 Mid-stream deliverable state
 
@@ -296,7 +319,7 @@ Three stores, never substituted for each other: LangGraph checkpoints restore wo
 
 **Model vs. code:** the model interprets language and writes drafts. Code does arithmetic, identity resolution, traversal, policy gates, classification rules, retries, and verification.
 
-**Not needed for this MVP:** PyMuPDF/PDF-to-image extraction (fixtures are JSON/text), a separate FastAPI server, a base-agent inheritance hierarchy, fixed Flash/Pro model routing. A later PDF input or live adapter must justify its own dependency.
+**Not needed for this MVP:** PyMuPDF (added only if the P1 contract-PDF case is reached, §12.4), PDF-to-image/OCR, a separate FastAPI server, a base-agent inheritance hierarchy, fixed Flash/Pro model routing. A later PDF input or live adapter must justify its own dependency.
 
 **SQLite + Streamlit:** Streamlit runs scripts in threads. Open connections with `sqlite3.connect(path, check_same_thread=False)`, enable WAL, and serialize domain writes through one module. Set `LANGGRAPH_STRICT_MSGPACK=true` (recommended by the checkpointer package to restrict checkpoint deserialization).
 
@@ -340,6 +363,9 @@ Prompts for model-backed roles: role → authoritative policy → scoped evidenc
 | `Receipt` | `operation_key`, `action_id`, `attempt`, `status`, `external_reference`, `observed_version`, `error_class`, `started_at`, `finished_at` |
 | `VerificationResult` | `phase` (`preflight`/`read_back`), `action_id`, `predicate`, `expected`, `observed`, `passed`, `evidence_id` |
 | `AgentMessage` | `message_id`, `run_id`, `from_role`, `to_role`, `kind`, `payload`, `evidence_ids`, `created_at` |
+| `Claim` | `claim_id`, `source_id`, `span`, `subject_id`, `field`, `value`, `normalized_value`, `author_person_id`, `channel`, `authority_status` (`in_scope`/`out_of_scope`/`affiliated_unverified`/`unknown`), `certainty`, `chat_only`, `occurred_at`, `supersedes_claim_id`, `status` (§8.1) |
+| `Conflict` | `conflict_id`, `subject_id`, `field`, `kind` (`claim_conflict`/`record_drift`), `candidate_claim_ids`, `status` (`open`/`resolved`), `resolution_claim_id`, `decided_by`, `reason`, `decided_at` |
+| `Contact` | `person_id`, `sponsor_id`, `role`, `scopes[]`, `is_primary`, `verified_by`, `valid_from`, `valid_to`, `delegated_by` |
 
 Run state holds IDs and small payloads (run ID, source ref, rule findings, plan ref, approval ref, pending actions, receipts, verification results, retry counts, errors). Bulky documents stay in evidence storage.
 
@@ -366,6 +392,20 @@ Example extracted change:
 
 An old value stated in an email is a claim, not a precondition; compare it with the authoritative record and flag divergence. Reject unsupported currencies, negative amounts, missing sponsor identity, invalid dates, unknown tools, and actions without evidence. Use explicit null/unknown instead of guessing.
 
+### 8.1 Claim lifecycle
+
+Every statement from any channel (email, chat, document page) becomes a `Claim`. Claims are stored as `facts` rows, and `status` carries the lifecycle:
+
+```text
+claimed ──► proposed ──► accepted          approved and verified: current truth
+   │            └──────► rejected          human rejected the change
+   ├──► contested ──► proposed | rejected  after human resolution (§10.4)
+   ├──► superseded                         newer claim, same or higher authority
+   └──► retracted                          source message deleted
+```
+
+Baseline records loaded from fixtures enter as `accepted` with fixture provenance. A `ChangeRequest` is built only from a `proposed` claim. Only the Verification read-back phase moves a claim to `accepted` (§9.2).
+
 ## 9. Persistent memory and knowledge graph
 
 ### 9.1 Short-term memory
@@ -378,6 +418,20 @@ Persist sources, sponsor contacts and aliases, commitments, policies, dependenci
 
 Facts are **bi-temporal**: `valid_from`, `valid_to` (when true in the world) and `recorded_at` (when we learned it), plus `superseded_by`. Superseded facts are closed, never deleted, so "Aster was Gold until 2026-11-14T06:4x, changed by run-001, approved by X" is answerable. (Pattern inspired by Graphiti/Zep temporal graphs, implemented in plain SQLite tables.)
 
+**Memory layers.** Working memory (§9.1) is per run; long-term memory has three layers with different write rules:
+
+| Layer | Store | Holds | Written by |
+|---|---|---|---|
+| Working (short-term) | LangGraph checkpoint, `thread_id = run_id` | Run state, findings, plan ref, receipts | The workflow; a summary is copied to `runs` when the run ends |
+| Episodic | `sources`, `runs`, `plans`, `plan_approvals`, `agent_messages`, `audit_events` | Who said what; what was decided and done | Append-only |
+| Semantic | `facts`, `entities`, `edges`, domain records | What is true now, and what was true when | Promotion gate only |
+| Procedural | `policies`, `EVT-*` rules | How to decide | Humans, versioned |
+
+- **Promotion gate:** a claim becomes current truth (`facts.status = accepted` with open `valid_to`) only in the Verification read-back phase, after its approved effect is observed. Unapproved claims stay `claimed`, `contested`, or `rejected`: remembered, never treated as truth.
+- **Retrieval by ID, not similarity:** Knowledge loads by event and sponsor ID: current facts, open claims, open conflicts, the sponsor's recent decisions, and the spans behind them. No vector store.
+- **Least context per role:** each agent gets only what its contract needs (§10). Planning never sees raw chat; no prompt sees a raw sensitive value (§13.3).
+- **No deletion:** superseding closes `valid_to`; a deleted source marks its derived claims `retracted`.
+
 Scenario 2 (P1) demonstrates recall: the run shows the prior Aster decision and the deficit carried from run 1 before planning Brightline's change.
 
 ### 9.3 Database (`runtime/domain.sqlite`)
@@ -387,8 +441,9 @@ Scenario 2 (P1) demonstrates recall: the run shows the prior Aster decision and 
 | `sources` | ID, system, external ID, thread ID, channel, sender, timestamps, immutable body, content hash; unique (system, external ID) |
 | `entities` | ID, event ID, type, canonical name, attributes JSON, version |
 | `aliases` | entity ID, alias, source ID |
-| `contacts` | person ID, sponsor ID, email/handle, authority level |
-| `facts` | subject, predicate, value JSON, source ID + span, `valid_from`, `valid_to`, `recorded_at`, `superseded_by`, authority, status |
+| `contacts` | person ID, sponsor ID, role, field scopes, primary flag, `verified_by`, `valid_from`/`valid_to`, delegation source (§10.2) |
+| `channel_identities` | person ID, system, handle, verified, verified via (P1) |
+| `facts` | subject, predicate, value JSON, normalized value, source ID + span, channel, `chat_only`, `valid_from`, `valid_to`, `recorded_at`, `superseded_by`, authority, status (claim lifecycle, §8.1) |
 | `edges` | source entity, relation, target entity, `provenance` (`declared`/`inferred`), evidence ID + span, `valid_from`/`valid_to`; relation allowlist |
 | `sponsors` | ID, event ID, commitment paise, currency, tier, cash received paise, version |
 | `deliverables` | ID, sponsor ID, kind, status, reversible, external ref, owner ID, version |
@@ -398,6 +453,11 @@ Scenario 2 (P1) demonstrates recall: the run shows the prior Aster decision and 
 | `operations` | unique operation key, payload hash, status, attempts, receipt, before/after, timestamps |
 | `agent_messages` | §8 `AgentMessage` |
 | `audit_events` | run/action IDs, event type, actor, timestamp, source/receipt refs, Coordinator route + reason |
+| `sensitive_vault` | placeholder, class, raw value (`confidential` class only), source ID, raw source body when pseudonymized, access log (§13.3) |
+| `conflicts` | §8 `Conflict` (P1) |
+| `connector_health` | connector, state (`ok`/`degraded`), consecutive failures, last probe (P1) |
+| `document_chunks` | source ID, page, text; FTS5 index if available (P1) |
+| `sync_cursors` | connector, cursor value (live connectors only; roadmap) |
 
 `decisions` (business records) and `plan_approvals` (our workflow approvals) are deliberately different tables. Foreign keys on; every multi-row change in one transaction. Fixtures live in Git; runtime databases are generated and ignored.
 
@@ -438,15 +498,75 @@ Relational lookups and alias tables first; full-text search only if needed; no v
 
 Context budget: roughly 4,000-8,000 input tokens per model call; trim history, never the evidence that justifies a write.
 
-Conflict rules:
+Conflict handling has four parts: what gets processed (§10.1), who may say what (§10.2), which claim wins (§10.3), and what happens when values disagree (§10.4). Confidence labels throughout describe evidence quality (identity resolved, explicit amount and currency, known authority, no contradiction, declared vs. inferred link). A model's self-rated probability is not calibrated confidence.
 
-- An unknown sender is not financial authority, regardless of timing.
-- Latest receipt time is not automatically the effective commitment.
-- Two authorized contacts disagreeing without clear supersession → keep both claims, ask for clarification.
-- "Maybe reduce" or "can we discuss" → `certainty = tentative` → no commitment write.
-- Tracker vs. email disagreement → show the discrepancy, require a decision.
-- Relative dates ("today", "tomorrow") resolve from the source timestamp in IST, never the host clock.
-- Confidence labels describe evidence quality (identity resolved, explicit amount and currency, known authority, no contradiction, declared vs. inferred link). A model's self-rated probability is not calibrated confidence.
+### 10.1 Ingestion funnel
+
+Store everything; remember selectively. Every message is kept as an immutable source. Only grounded claims enter memory, and only approved, verified claims become truth (§8.1).
+
+| Stage | Cost | Rule |
+|---|---|---|
+| 0. Scope | none | Only allowlisted channels, threads, and sponsor domains for this event |
+| 1. Normalize | none | Deduplicate on `(source_system, external_id)`; rebuild threads (email `In-Reply-To`/`References`, chat thread and reply IDs); strip quoted replies and signatures before extraction; pseudonymize sensitive values (§13.3) |
+| 2. Relevance | none | Process only if the sender is a known contact, or the text matches an entity alias or ID, or a money, date, or deliverable pattern. Otherwise store as `low_relevance` without processing |
+| 3. Classify and extract | model (fixture in tests) | Intent (`commitment_change`, `deliverable_update`, `deadline`, `question`, `other`) and entities with spans, for stage-2 survivors only |
+| 4. Store | none | Each grounded statement becomes a claim with `status = claimed` |
+
+Quote stripping (P1) matters for real replies: an unstripped quoted "INR 100,000" would be extracted as a second, contradicting claim. The frozen `mail-aster-002` has no quoted text, so this needs a new fixture source.
+
+Source changes: an edited message becomes a new source version (new content hash; old version kept), and claims derived from it are re-evaluated. A deleted message marks its claims `retracted`. A forwarded message is not a statement by the forwarder, and its original author is usually unknown, so its authority is `unknown`. Voice notes and images are stored and flagged as unprocessed. A rolling thread summary may be used as context, never as evidence for a write.
+
+### 10.2 Identity and authority
+
+- `channel_identities` links each person to their handles (email address, chat user ID, phone number). A new handle claiming to be a known contact stays unverified until confirmed through an already verified channel; the confirmation is stored as evidence.
+- `contacts` holds per-field authority scopes (`commitment`, `benefits`, `deliverables`, `artwork`, `payment_details`), a primary-contact flag, and `verified_by` (named in the contract, or confirmed by the verified primary contact). A self-declared title ("I'm the new partnerships head") is a claim, not authority.
+- A claim's `authority_status` is `in_scope`, `out_of_scope`, `affiliated_unverified` (sponsor's email domain, unknown person), or `unknown`. Only `in_scope` can support a proposed write. An unknown sender is not financial authority, regardless of timing.
+- An in-scope contact may delegate ("Rahul handles the amount from now on"). This creates a delegation record with scope and expiry; that message is its evidence.
+- A look-alike domain (`asterlabs.co` instead of `asterlabs.com`) raises a spoofing flag.
+- A request to change payment or bank details is never actioned from email or chat alone. The system flags it for out-of-band verification by a human, using a phone number already on file. This is the business-email-compromise pattern and the highest-risk case.
+
+### 10.3 Precedence across channels
+
+When claims about one field arrive through different tools, deterministic precedence picks the **proposed** value, in this order:
+
+1. Author's authority scope for that field (§10.2).
+2. Explicit supersession ("revising the amount I emailed yesterday").
+3. Certainty: "maybe reduce" or "can we discuss" is `tentative` and never writes a commitment.
+4. Channel bindingness for financial fields, **only between claims from the same author**: signed contract > email > team chat or messaging.
+5. Recency by the source's `occurred_at` (not ingestion time), only between claims from the same author that are equal on 1-4.
+
+Claims from **two different in-scope people** that disagree without explicit supersession are `contested` (§10.4), whatever the channel: email is not automatically higher authority than Slack or WhatsApp. Fixture `S1-authorized-conflict` (Priya's email INR 60,000 vs. Neil's WhatsApp INR 80,000) expects a pause; `S1-conflict-clarified` resolves it only through an explicit follow-up that replaces both claims, followed by organizer approval. A forwarded or unmapped claim never gains authority from the person who forwarded it (`S1-unauthorized-whatsapp`), and a delayed historical amount is not a new conflicting instruction (`S1-stale-chat`).
+
+The latest receipt time is not automatically the effective commitment. A late-arriving older message is recorded with its own valid time and does not override a newer fact. A new claim during an active run is a replan trigger (§11.3). Relative dates ("today", "tomorrow") resolve from the source timestamp in IST, never the host clock.
+
+**Binding-channel rule:** a financial change received only through chat, even from an in-scope contact, becomes a proposal flagged `chat_only`, and the plan adds a confirmation-email draft. The approver may explicitly accept the chat message as sufficient; that choice is recorded in the approval. Per-sponsor configuration may mark a channel as binding (for example an official shared channel).
+
+Example: Priya emails INR 100,000 on Monday and writes INR 80,000 in chat on Tuesday. Same authority, explicit, newer → INR 80,000 is proposed with `chat_only`; the plan includes a confirmation email and needs approval.
+
+### 10.4 Mismatches, conflicts, and the system of record
+
+**Record drift** (two tools store different values, e.g. tracker INR 100,000 vs. a budget-sheet row INR 90,000): each field has one system of record; other copies are projections. Drift produces a "sync from system of record" action that goes through normal approval. A projection never overwrites the system of record.
+
+| Field | System of record |
+|---|---|
+| Commitment, tier, cash received | Tracker (`sponsors`) |
+| Expenses, pending decisions | Budget sheet (expense rows, `decisions`) |
+| Deliverable status | `deliverables` |
+| Dates and review meetings | Calendar |
+| Benefits wording | Benefits document |
+
+**Claim vs. record:** an old value stated in a message that differs from the system of record ("from INR 100,000" while the tracker holds INR 90,000) is shown as a discrepancy and requires a decision (§8).
+
+**Claim conflict** (sources disagree about what the value should be), deterministic decision tree:
+
+1. **Normalize:** currency, paise, Indian notation (`₹1L`, `1 lakh`, `1,00,000`, `100k`), tax basis (GST-inclusive vs. exclusive). Equal after normalization → no conflict. Differing amounts with unknown tax basis → ambiguity, ask.
+2. Explicit supersession by the same or higher authority → the newer claim is proposed.
+3. Different authority → the higher-scope claim is proposed; the other is recorded.
+4. Same authority, no supersession, different values → both `contested`; open a `conflicts` row; block financial writes on that field; draft a neutral clarification to the sponsor's primary contact, copying both authors. We do not choose between two employees of the same sponsor.
+
+Stored: every claim with its status, and each `conflicts` row with candidates, resolution, `decided_by`, and reason. A human resolution is recorded as a source and becomes evidence. The system of record changes only through an approved, verified plan.
+
+Human intervention: always for contested money and payment-detail changes; never needed when values match after normalization. Every commitment write already requires approval (§13.1).
 
 ## 11. Planning, mid-stream reasoning, and adaptive replanning
 
@@ -502,7 +622,7 @@ Stable rule IDs make findings explainable (pattern adapted from uplan-ai's rule 
 
 | Rule | Check / outcome |
 |---|---|
-| `EVT-SRC-001` | Amount/currency, sponsor identity, and authorized source established; missing, tentative, or contradictory evidence blocks the proposed write |
+| `EVT-SRC-001` | Amount/currency, sponsor identity, and authorized source established, with the author in scope for the changed field (§10.2); chat-only financial claims carry the `chat_only` flag (§10.3); missing, tentative, out-of-scope, or contradictory evidence blocks the proposed write |
 | `EVT-FIN-001` | Recompute commitments, expenses, and forecast in integer paise; a deficit is a disclosed finding, not permission to cut expenses |
 | `EVT-BEN-001` | Proposed benefits follow the cited tier policy and approval scope; the model cannot invent thresholds or cancel a contract |
 | `EVT-DLV-001` | Every affected deliverable is classified per §11.2; irreversible or already-done items become `flag_human` or `no_op_satisfied`, never a cancel |
@@ -510,12 +630,16 @@ Stable rule IDs make findings explainable (pattern adapted from uplan-ai's rule 
 | `EVT-DEP-001` | Every affected dependency has an action or an explicit unresolved/excluded disposition; a blocking unresolved prerequisite prevents completion |
 | `EVT-APR-001` | Each consequential action has an approval for its exact current payload and relevant versions; enforced again immediately before execution |
 | `EVT-VER-001` | After execution, observed values and logical record counts match approved effects; an executor receipt alone cannot pass |
+| `EVT-CON-001` | No open conflict on any field a proposed write touches; values equal after normalization are not conflicts; a contested field blocks its writes and yields a clarification draft (§10.4) |
+| `EVT-PII-001` | No raw sensitive value in any model payload, log, `agent_messages` row, or outbound message outside an approved scope; a match blocks the call (§13.3) |
 
 Evaluate only rules applicable to the current phase. Before approval, `EVT-APR-001` marks actions as requiring approval rather than failing the plan. Missing required data yields `unknown`, not `pass`; block affected writes and ask for clarification. Fully disclosed warnings (such as the deficit) proceed only within the approval policy. Findings carry the `context_hash` so old results cannot authorize a revised plan.
 
 Verification runs twice and logs the phases separately: **preflight** reviews the plan before the human sees it (missing evidence, omitted dependents, unsupported benefit changes, stale versions → back to Planning); **read-back** checks actual records after execution (§15). An optional model critique may explain a possible omission, but deterministic rules decide gates and actual reads establish effects.
 
 ## 12. Tool contracts and simulated applications
+
+### 12.1 Simulated tools (P0)
 
 Five simulated apps backed by real tables: **Mail**, **Team chat**, **Tracker** (sponsorship tracker and budget sheet), **Docs** (benefits doc, run sheet), **Calendar**. Tools actually read and mutate records. The UI is labeled **Simulated connectors**.
 
@@ -534,9 +658,40 @@ Five simulated apps backed by real tables: **Mail**, **Team chat**, **Tracker** 
 | `send_mail(...)` | Sponsor-facing; separate approval scope; reconciliation support |
 | `read_record(kind, target_id)` | Fresh read for Verification |
 
-Typed failures: validation, unauthorized, not found, version conflict, rate limit, transient unavailable, ambiguous timeout, permanent failure. Each class has its own handling (§14). Fault injection targets a specific operation and attempt, persists that it fired, and is off unless enabled.
+Typed failures: validation, unauthorized, not found, version conflict, rate limit, transient unavailable, ambiguous timeout, permanent failure, auth expired (live adapters only). Each class has its own handling (§14). Fault injection targets a specific operation and attempt, persists that it fired, and is off unless enabled.
 
 Gmail, Sheets, and Calendar integration is deferred. After the simulated vertical slice passes, choose at most one live connector (preferably a test sheet): test account, narrowest scopes, credentials outside Git and logs, auth time-boxed to about 20 minutes. Keep the same tool contract so an adapter swaps in without changing agent logic; do not build a generic integration framework in advance.
+
+### 12.2 Live-adapter contract (designed, not built)
+
+Agents keep the same tool contract; each adapter handles its provider's limits. Only Calendar offers a natural idempotency mechanism, so the others use a marker plus read-back reconciliation (§14.3).
+
+| Tool | Duplicate prevention and reconciliation | Notes |
+|---|---|---|
+| Gmail | Send from a stored draft ID; carry the operation key in a custom `X-SecondBrain-Op` header. After an ambiguous timeout, check whether the draft still exists and read that header on recent Sent messages in the thread before any retry | Gmail is reported to replace a custom `Message-ID` on API sends, so it is not used as the key |
+| Slack | Operation key in the message `metadata`; reconcile with `conversations.history` including metadata | HTTP 429: wait for `Retry-After` |
+| WhatsApp (Cloud API) | Reconcile with the returned message ID (`wamid`) and status webhooks | Free-form messages only inside the 24-hour customer-service window; templates outside it |
+| Google Sheets | No compare-and-set: keep a version column, read-check-write, then read back | Quota errors are rate limits |
+| Google Calendar | Supply the event `id` (base32hex) derived from the operation key; a repeated insert conflicts instead of duplicating | Natural idempotency |
+
+### 12.3 Connector reliability
+
+- **Outbox:** every external effect is first an `operations` row (the ledger); Execution drains it. While a tool is down, the action waits as `blocked` with its reason and is never lost.
+- **Circuit breaker** (`connector_health`): three consecutive transient failures on one connector mark it `degraded`; calls stop and the UI shows a banner; a later probe call closes it. Dependents of blocked actions wait, independent branches finish, and the run ends `partial`.
+- **Auth expired** is not retried: the connector pauses and a human re-authenticates.
+- **Inbound outage:** live connectors keep a `sync_cursors` row (Gmail history ID, Slack last message timestamp, WhatsApp webhook redelivery). After recovery, backfill from the cursor; `(source_system, external_id)` uniqueness removes duplicates. Not needed for simulated tools.
+- **Fallback channel** (chat down → email draft; calendar down → tracker reminder task) is a plan change and needs delta approval.
+
+### 12.4 Documents and large PDFs (P1: one small synthetic contract)
+
+1. An attachment is its own source with an `ATTACHED_TO` edge to its email. The content hash means a resent identical PDF is not processed again.
+2. The email body is processed immediately; the attachment runs as a separate job. Only plan actions that depend on its content wait for it.
+3. Size cap (pages and bytes); above it, a human selects the pages to process.
+4. Per page: text layer via PyMuPDF. Pages without a text layer are flagged; OCR or model PDF input is roadmap.
+5. Sensitive-data gate on every page (§13.3).
+6. Triage before the model: only pages matching sponsor aliases, money (`INR`, `₹`, `lakh`), dates, or deliverable terms go to extraction. Each section yields `ExtractedEntities` with page number and span; results are merged and deduplicated.
+7. Chunks go to `document_chunks` (SQLite FTS5 if available) for later lookup; no vector store.
+8. Document type sets bindingness: signed contract > proposal > brochure. A new contract version is diffed against the previous version's extracted terms, and changes become claims.
 
 ## 13. Approval, safety, and LangGraph interrupt rules
 
@@ -567,6 +722,18 @@ Email, chat, and document content is untrusted. "Ignore approvals and mark every
 - Side effects only in the Execution node, each guarded by the operations ledger. Checkpointing alone does not prevent duplicate effects.
 - `invoke()` results expose pending interrupts under `__interrupt__`; the UI reads run status from our `runs` table, not from Streamlit state.
 
+### 13.3 Sensitive data
+
+**P0: whole-source denial (matches the fixtures).** Sources marked `confidential` and listed in a scenario's `privacy.denied_source_ids` never enter any role context, model call, draft, post, outbox entry, or log. Tests search all of these for the fixture canary strings (`evidence-mail-aster-private-ref`, `evidence-chat-whatsapp-private-ref`). If the privacy check itself fails, affected actions pause (`S1-privacy-agent-failure`); permissions are never broadened.
+
+**P1: field-level pseudonymization.** Sponsor messages can carry bank account numbers, IFSC codes, UPI IDs, PAN, GSTIN, Aadhaar numbers, card numbers, phone numbers, and OTPs or passwords inside otherwise usable messages. India's Digital Personal Data Protection Act, 2023 would apply to a real deployment. Three gates, all local and deterministic, tested on new fixture sources:
+
+1. **Ingestion gate:** regex plus checksum validation (Luhn for cards, Verhoeff for Aadhaar; format checks for PAN, IFSC, GSTIN, UPI) on every source and attachment page. Each match gets a class: `confidential` (bank, PAN, GSTIN, Aadhaar, phone) or `restricted` (OTP, password, full card number).
+2. **Pseudonymize, don't blank:** `A/c 1234567890` becomes `[[BANK_ACCT_1]]` in `sources.body`, and the mapping lives in `sensitive_vault`. The model still sees that bank details were shared, never the value. `restricted` values are not stored at all: keep a hash and the last four characters, and flag a human to ask the sender to use a secure channel.
+3. **Egress gate:** `llm.py` and every outbound tool rescan the final payload; any raw match blocks the call and records an `EVT-PII-001` finding. This also stops sponsor data being posted to the wrong chat channel.
+
+Placeholders are restored only inside Execution, for an approved action whose scope allows that data. Logs and `agent_messages` never contain raw values. Spans index the pseudonymized body; the raw body stays immutable in the vault with access logged, so evidence is preserved without exposing it to agents. Prototype: a plain table in the ignored `runtime/` database; encryption at rest and named-person access control are roadmap.
+
 ## 14. Idempotency, retries, and crash recovery
 
 ### 14.1 Three identities
@@ -593,6 +760,19 @@ Use provider idempotency keys where available; otherwise attach a stable marker 
 
 Action statuses: `planned`, `awaiting_approval`, `ready`, `running`, `retry_wait`, `unknown`, `committed`, `verified`, `failed`, `blocked`, `superseded`. Run statuses: `completed_verified`, `awaiting_human`, `partial`, `failed`, `rejected` (human rejected the first plan; no business writes). Rejecting a v2 delta after some effects committed is `partial`, not `rejected`.
 
+### 14.5 Agent and model failure
+
+Agents are LangGraph nodes in one process, not services, so "an agent is offline" means one of these:
+
+| Failure | Response |
+|---|---|
+| Process crash or restart | Resume from the checkpoint with the same `thread_id`; the ledger blocks repeated effects; on startup, runs left `running` are listed and resumed |
+| Model unavailable, out of quota, or timed out (only Communication and draft writing call it) | Degraded mode: deterministic fallback extraction (regex for amounts, currency, dates + alias match), labeled `extraction_mode = fallback`; a human confirms the extracted values in the UI before any financial write. Drafts fall back to templates. Knowledge, Planning, Execution, Verification, and Coordinator are deterministic and keep working |
+| Node exception or timeout | Coordinator records the error class; a pure node is retried once; otherwise `awaiting_human` with the reason |
+| Schema-invalid or span-invalid model output | Rejected; one re-ask with the validation error; then the fallback path above |
+
+Fail closed: if preflight, approval, or read-back cannot run, the run cannot reach `completed_verified`; it ends `awaiting_human` or `partial`. Messages that arrive during an outage wait in `sources` and are processed afterwards. A message about the same sponsor during an active run is a replan trigger (§11.3).
+
 ## 15. Verification and explainability
 
 This section is the **read-back** phase; the preflight phase is in §11.5. Verification reads target records independently; a success receipt alone is not verification.
@@ -617,8 +797,8 @@ Final summary: what changed, what was verified, what is blocked or flagged for h
 
 One Streamlit workspace:
 
-1. **Scenario controls:** fixture selector, reset synthetic workspace, fault toggles (transient tracker, concurrent edit), fixture/live model mode, simulated time display.
-2. **Inbox and evidence:** email thread and team chat with sender authority, timestamps, highlighted extracted spans, competing claims.
+1. **Scenario controls:** fixture selector, reset synthetic workspace, fault toggles (transient tracker, concurrent edit; P1: model outage, calendar outage), fixture/live model mode, simulated time display.
+2. **Inbox and evidence:** email thread and team chat with sender authority and scope, timestamps, highlighted extracted spans, sensitive values shown as placeholders, claim status, open conflicts with their candidate claims.
 3. **Impact preview:** old/new amounts, balance, cascade paths (declared solid, inferred dashed), deliverable classification table, at-risk decisions.
 4. **Plan and approval:** preflight rule findings (pass/fail/unknown with evidence), diff table per scope, dependencies, risk flags, approve/reject, plan version and delta on re-approval.
 5. **Agent timeline:** handoff messages and Coordinator decisions with reasons.
@@ -635,13 +815,14 @@ Fixture files:
 ```text
 data/fixtures/
   scenarios.json         # per scenario: baseline, DEMO_NOW, triggering source, faults/conflicts
-  sponsors.json          # sponsors, contacts, aliases
-  sources.json           # email thread + team chat messages
+  sponsors.json          # events, budgets, expenses, people, contacts, aliases, sponsors
+  sources.json           # threads, sources (Gmail/Slack/WhatsApp labels), evidence spans
   policies.json          # tier policy with entitlements
   deliverables.json      # D1-D4 with status, reversibility, owners
   decisions.json         # DEC-05, DEC-07 with structured conditions
   dependencies.json      # declared edges with evidence
   documents.json         # benefits doc, run sheet
+  attachments/           # P1, not built: synthetic contract PDF
   calendar.json
   expected_outcomes.json # independent expectations per scenario
 ```
@@ -658,7 +839,17 @@ Each scenario loads a fresh baseline into SQLite so runs do not contaminate each
 | S2 (P1): Brightline 90k → 100k, after S1 | Recall run 1 decisions; Silver → Gold upgrade proposal; balance −1,000,000 → 0; DEC-07 still blocked (0 < 25,000) |
 | Tentative reduction / missing currency | Clarification; no financial write |
 | Unknown sender requests change | Authority unresolved; consequential actions blocked |
-| Contradictory authorized messages | Both claims shown; no silent overwrite |
+| Priya (email) INR 60,000 vs. Neil (WhatsApp) INR 80,000 (P1, `S1-authorized-conflict`) | Both claims `contested`; one `conflicts` row; clarification draft to primary contact; zero financial writes |
+| Out-of-scope Aster contact (marketing) changes the amount | Claim recorded `out_of_scope`; no write; request to the primary contact |
+| Unknown person on Aster's email domain | `affiliated_unverified`; no write |
+| Chat-only revision after email (P1) | Proposal flagged `chat_only`; confirmation-email draft; approval required |
+| `₹1L` vs. `INR 100,000` | Equal after normalization; no conflict |
+| Reply quotes the old amount (P1, new source) | Quoted amount not extracted as a new claim |
+| Confidential source denied (`S1-privacy-scope`) | Absent from every context, draft, post, outbox entry, and log |
+| Sensitive value inside an allowed message (P1, new source) | Pseudonymized; model payload holds the placeholder only |
+| Bank-detail change request | Flagged for out-of-band verification; no action |
+| Model outage (P1) | Fallback extraction; human confirms values before any financial write |
+| Contract PDF attachment (P1) | Page-cited claims; resent PDF not processed again |
 | Duplicate input | No new run effects; link to prior run |
 | Timeout after write | Reconcile by read-back before any retry |
 | Malicious instruction in chat/email | Stored as untrusted; no unauthorized action |
@@ -685,6 +876,17 @@ Minimum checks:
 - Schema failure, unknown authority, and prompt injection cannot pass the gate.
 - Compact context keeps every decision-critical amount, timestamp, source reference, and unresolved conflict; omitting required evidence causes retrieval or a pause.
 - Preflight catches a deliberately omitted dependent task, an unsupported benefit change, and a missing approval requirement; test expectations are unavailable to the planner.
+- Denied confidential sources and their canary strings never appear in any role context, draft, post, outbox entry, or log (`S1-privacy-scope`).
+- P1: a quoted old amount in a reply is not extracted as a new claim.
+- P1: a raw PAN, bank account number, or OTP never reaches a model payload, log, or `agent_messages` row; the egress gate blocks a deliberately planted raw value.
+- An out-of-scope or `affiliated_unverified` author produces a recorded claim and zero writes.
+- Two in-scope contacts with different amounts produce two `contested` claims, one `conflicts` row, and zero financial writes.
+- `₹1L`, `1 lakh`, `1,00,000`, and `INR 100,000` normalize to the same paise value.
+- A chat-only financial change gets the `chat_only` flag and a confirmation draft; nothing is written without explicit approval.
+- An older message ingested late does not override a newer accepted fact.
+- Model outage: fallback extraction, and no financial write before human confirmation.
+- The connector circuit breaker opens after three consecutive failures; independent actions finish; the run ends `partial`.
+- The same PDF ingested twice is processed once (P1).
 
 | Metric | Target |
 |---|---|
@@ -705,7 +907,7 @@ Record actual pass counts, latency, and tokens in the final README. One fixture 
 
 1. Fabricate the consistent cross-app baseline, S1 scenario inputs, and test-only expected outcomes (§4, §17).
 2. SQLite schema, seed/reset, versions, tools with typed failures, operations ledger.
-3. Deterministic S1 test: extract (fixture) → resolve → traverse → `EVT-*` findings → classify → plan → preflight → approve → execute → read-back verify → replay.
+3. Deterministic S1 test: ingest (dedupe, privacy denial) → extract (fixture) → resolve (incl. authority check) → traverse → `EVT-*` findings → classify → plan → preflight → approve → execute → read-back verify → replay.
 4. LangGraph wiring of the six agents with SQLite checkpointer; interrupt/resume test across restart.
 5. Fault injection: transient retry, then concurrent edit → replan → delta approval.
 6. Streamlit UI: inbox/evidence, impact preview, preflight findings, approval, agent timeline, verification.
@@ -783,14 +985,15 @@ HackInnovision26-MetaVision/
   second_brain/
     schemas.py            # Pydantic models (§8)
     storage.py            # SQLite schema, seed/reset, transactions
+    ingest.py             # Funnel stages 0-2 (§10.1), sensitive-data detection and pseudonymization (§13.3)
     tools.py              # Simulated apps, typed failures, fault injection
     graph_memory.py       # Edges, traversal, alias inference, bi-temporal facts
     agents.py             # Six agent functions with contracts
     planning.py           # Classification rules, plan build/validate, replan delta
-    policy.py             # Deterministic EVT-* rules, approval binding, scopes
+    policy.py             # Deterministic EVT-* rules, precedence and conflicts (§10.3-§10.4), approval binding, scopes
     verification.py       # Independent preflight and read-back checks
     workflow.py           # LangGraph wiring, interrupt, checkpointer
-    llm.py                # Gemini adapter + fixture mode
+    llm.py                # Gemini adapter + fixture mode + egress gate (§13.3)
   data/fixtures/          # Synthetic sources and expected outcomes
   tests/
   runtime/                # Ignored: domain.sqlite, checkpoints.sqlite
@@ -846,6 +1049,14 @@ Before presenting:
 - **Timeout after a write?** Operation key plus read-back reconciliation; unknown → pause, never blind retry.
 - **What is live?** State exactly which model and tools are live; simulated sends are not real email.
 - **Scaling?** Authenticated users, hosted Postgres, real connectors with provider reconciliation: roadmap, not implemented.
+- **Sponsor emails today and changes the amount in chat tomorrow?** Precedence in §10.3: authority scope, explicit supersession, certainty, channel bindingness, then time. A chat-only money change becomes a proposal with a confirmation-email draft; the approver decides.
+- **Two employees of the same sponsor give different amounts?** Per-field scopes (§10.2). Out of scope → recorded, not actionable. Both in scope → `contested`, clarification to the primary contact, no write. We do not pick between them.
+- **Tools disagree on a value?** One system of record per field. Drift becomes a sync proposal; claim conflicts follow the §10.4 decision tree; money conflicts always go to a human.
+- **What does the model see of bank details or PAN?** Placeholders only; the egress gate blocks raw values (§13.3).
+- **What if Gemini is down?** Only extraction and drafts use it. Fallback extraction plus human confirmation; the other five agents are deterministic (§14.5).
+- **What if Gmail or Slack is down?** Outbox wait, circuit breaker, backfill from a cursor after recovery; switching to a fallback channel is a plan change that needs approval (§12.3).
+- **A sponsor emails a 60-page PDF?** Separate job, hash dedupe, page triage before the model, page-cited claims (§12.4).
+- **Do you store every message?** Every source, immutably. Only grounded claims enter memory; only approved and verified claims become truth (§8.1, §10.1).
 
 ### 25.3 Submission package
 
@@ -868,6 +1079,8 @@ Working prototype, repository, concise README (setup, exact capabilities, archit
 | SQLite thread errors under Streamlit | `check_same_thread=False`, WAL, separate checkpoint file |
 | Deadline ambiguity | Ready at 09:30 IST; confirm with organizers |
 | Polish hides weak reliability | Rehearse failure, replan, replay, verification before cosmetics |
+| Robustness additions crowd out P0 | Only three small P0 additions (§3.1); everything else is P1 or roadmap |
+| 19 fixture scenarios are marked P0 | Fixture priorities, not demo requirements; build for `S1-main-demo` first |
 
 **Next task:** write the S1 fixtures and `expected_outcomes.json`, then a deterministic test that approves the Aster change, survives the fail-once tracker write, replans after the concurrent D3 edit, verifies the −INR 10,000 balance and `DEC-07 at_risk`, and replays the message with no extra effects.
 
