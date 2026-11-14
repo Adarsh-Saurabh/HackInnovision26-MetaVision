@@ -12,7 +12,7 @@ Needs Python 3.12 and [uv](https://docs.astral.sh/uv/).
 
 ```bash
 uv sync --locked
-uv run streamlit run app.py              # the demo UI, opens http://localhost:8501
+uv run python -m streamlit run app.py    # the demo UI, opens http://localhost:8501
 uv run pytest -q                         # 67 tests
 uv run python scripts/run_scenarios.py   # all 24 dataset scenarios vs expected outcomes
 ```
