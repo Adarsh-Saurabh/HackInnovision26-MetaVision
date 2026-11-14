@@ -1,0 +1,44 @@
+{
+  "schema_version": "metavision-fixtures/1",
+  "dataset_id": "dataset-innovision-2026-v1",
+  "policies": [
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-10-19T15:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-10-19T15:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-policy-tiers-body"
+      ],
+      "policy_id": "policy-tiers-v1",
+      "currency": "INR",
+      "selection": "highest_qualifying",
+      "tiers": [
+        {
+          "tier": "Gold",
+          "minimum_commitment_paise": 10000000,
+          "entitlements": {
+            "main_stage_banner_logo": true,
+            "sponsor_wall_banner_logo": false,
+            "social_posts": 2,
+            "stage_mention": true
+          }
+        },
+        {
+          "tier": "Silver",
+          "minimum_commitment_paise": 5000000,
+          "entitlements": {
+            "main_stage_banner_logo": false,
+            "sponsor_wall_banner_logo": true,
+            "social_posts": 1,
+            "stage_mention": false
+          }
+        }
+      ],
+      "benefit_reduction_requires_organizer_approval": true,
+      "below_minimum": "unresolved"
+    }
+  ]
+}

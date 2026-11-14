@@ -1,0 +1,100 @@
+{
+  "schema_version": "metavision-fixtures/1",
+  "dataset_id": "dataset-innovision-2026-v1",
+  "deliverables": [
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T21:40:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T23:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-chat-014-link",
+        "evidence-chat-014-production",
+        "evidence-tracker-deliverables"
+      ],
+      "deliverable_id": "D1",
+      "sponsor_id": "sponsor-aster",
+      "kind": "main_stage_banner_logo",
+      "status": "in_production",
+      "reversible": false,
+      "external_ref": "PH-2231",
+      "owner_id": "person-design",
+      "scheduled_at": null,
+      "document_ids": [
+        "doc-aster-benefits"
+      ]
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T22:05:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T23:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-chat-015-body",
+        "evidence-tracker-deliverables"
+      ],
+      "deliverable_id": "D2",
+      "sponsor_id": "sponsor-aster",
+      "kind": "social_post",
+      "status": "done",
+      "reversible": false,
+      "external_ref": null,
+      "owner_id": "person-social",
+      "scheduled_at": null,
+      "document_ids": [
+        "doc-aster-benefits"
+      ]
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T22:05:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T23:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-chat-015-body",
+        "evidence-tracker-deliverables"
+      ],
+      "deliverable_id": "D3",
+      "sponsor_id": "sponsor-aster",
+      "kind": "social_post",
+      "status": "scheduled",
+      "reversible": true,
+      "external_ref": null,
+      "owner_id": "person-social",
+      "scheduled_at": "2026-11-16T10:00:00+05:30",
+      "document_ids": [
+        "doc-aster-benefits"
+      ]
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T19:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T23:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-run-sheet-D4",
+        "evidence-tracker-deliverables"
+      ],
+      "deliverable_id": "D4",
+      "sponsor_id": "sponsor-aster",
+      "kind": "stage_mention",
+      "status": "planned",
+      "reversible": true,
+      "external_ref": null,
+      "owner_id": "person-events",
+      "scheduled_at": null,
+      "document_ids": [
+        "doc-aster-benefits",
+        "doc-run-sheet"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,844 @@
+{
+  "schema_version": "metavision-fixtures/1",
+  "dataset_id": "dataset-innovision-2026-v1",
+  "nodes": [
+    {
+      "node_id": "event-innovision-2026",
+      "event_id": "event-innovision-2026",
+      "node_type": "Event",
+      "record_id": "event-innovision-2026",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "budget-innovision-2026",
+      "event_id": "event-innovision-2026",
+      "node_type": "Budget",
+      "record_id": "budget-innovision-2026",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "sponsor-aster",
+      "event_id": "event-innovision-2026",
+      "node_type": "Sponsor",
+      "record_id": "sponsor-aster",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "sponsor-brightline",
+      "event_id": "event-innovision-2026",
+      "node_type": "Sponsor",
+      "record_id": "sponsor-brightline",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "sponsor-corvex",
+      "event_id": "event-innovision-2026",
+      "node_type": "Sponsor",
+      "record_id": "sponsor-corvex",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "commitment-aster",
+      "event_id": "event-innovision-2026",
+      "node_type": "Commitment",
+      "record_id": "sponsor-aster",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "commitment-brightline",
+      "event_id": "event-innovision-2026",
+      "node_type": "Commitment",
+      "record_id": "sponsor-brightline",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "commitment-corvex",
+      "event_id": "event-innovision-2026",
+      "node_type": "Commitment",
+      "record_id": "sponsor-corvex",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "policy-tiers-v1",
+      "event_id": "event-innovision-2026",
+      "node_type": "Policy",
+      "record_id": "policy-tiers-v1",
+      "record_file": "policies.json"
+    },
+    {
+      "node_id": "D1",
+      "event_id": "event-innovision-2026",
+      "node_type": "Deliverable",
+      "record_id": "D1",
+      "record_file": "deliverables.json"
+    },
+    {
+      "node_id": "D2",
+      "event_id": "event-innovision-2026",
+      "node_type": "Deliverable",
+      "record_id": "D2",
+      "record_file": "deliverables.json"
+    },
+    {
+      "node_id": "D3",
+      "event_id": "event-innovision-2026",
+      "node_type": "Deliverable",
+      "record_id": "D3",
+      "record_file": "deliverables.json"
+    },
+    {
+      "node_id": "D4",
+      "event_id": "event-innovision-2026",
+      "node_type": "Deliverable",
+      "record_id": "D4",
+      "record_file": "deliverables.json"
+    },
+    {
+      "node_id": "doc-aster-benefits",
+      "event_id": "event-innovision-2026",
+      "node_type": "Document",
+      "record_id": "doc-aster-benefits",
+      "record_file": "documents.json"
+    },
+    {
+      "node_id": "doc-run-sheet",
+      "event_id": "event-innovision-2026",
+      "node_type": "Document",
+      "record_id": "doc-run-sheet",
+      "record_file": "documents.json"
+    },
+    {
+      "node_id": "doc-budget",
+      "event_id": "event-innovision-2026",
+      "node_type": "Document",
+      "record_id": "doc-budget",
+      "record_file": "documents.json"
+    },
+    {
+      "node_id": "doc-brightline-benefits",
+      "event_id": "event-innovision-2026",
+      "node_type": "Document",
+      "record_id": "doc-brightline-benefits",
+      "record_file": "documents.json"
+    },
+    {
+      "node_id": "cal-volunteer-briefing",
+      "event_id": "event-innovision-2026",
+      "node_type": "CalendarItem",
+      "record_id": "cal-volunteer-briefing",
+      "record_file": "calendar.json"
+    },
+    {
+      "node_id": "person-priya",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-priya",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "person-aster-secondary",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-aster-secondary",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "person-brightline-contact",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-brightline-contact",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "person-corvex-contact",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-corvex-contact",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "person-design",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-design",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "person-social",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-social",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "person-events",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-events",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "person-finance",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-finance",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "person-organizer",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-organizer",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "person-unknown",
+      "event_id": "event-innovision-2026",
+      "node_type": "Person/Role",
+      "record_id": "person-unknown",
+      "record_file": "sponsors.json"
+    },
+    {
+      "node_id": "DEC-05",
+      "event_id": "event-innovision-2026",
+      "node_type": "Decision",
+      "record_id": "DEC-05",
+      "record_file": "decisions.json"
+    },
+    {
+      "node_id": "DEC-07",
+      "event_id": "event-innovision-2026",
+      "node_type": "Decision",
+      "record_id": "DEC-07",
+      "record_file": "decisions.json"
+    },
+    {
+      "node_id": "thread-aster",
+      "event_id": "event-innovision-2026",
+      "node_type": "Thread",
+      "record_id": "thread-aster",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "thread-brightline",
+      "event_id": "event-innovision-2026",
+      "node_type": "Thread",
+      "record_id": "thread-brightline",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "thread-corvex",
+      "event_id": "event-innovision-2026",
+      "node_type": "Thread",
+      "record_id": "thread-corvex",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "mail-aster-001",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "mail-aster-001",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "mail-brightline-001",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "mail-brightline-001",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "mail-corvex-001",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "mail-corvex-001",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "chat-014",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "chat-014",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "chat-015",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "chat-015",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "src-contact-register",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "src-contact-register",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "src-tracker-sponsors",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "src-tracker-sponsors",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "src-budget-v1",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "src-budget-v1",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "src-policy-tiers-v1",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "src-policy-tiers-v1",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "src-benefits-aster-v1",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "src-benefits-aster-v1",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "src-run-sheet-v1",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "src-run-sheet-v1",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "src-brightline-benefits-v1",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "src-brightline-benefits-v1",
+      "record_file": "sources.json"
+    },
+    {
+      "node_id": "src-calendar-existing-v1",
+      "event_id": "event-innovision-2026",
+      "node_type": "SourceMessage",
+      "record_id": "src-calendar-existing-v1",
+      "record_file": "sources.json"
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "edge-aster-event",
+      "event_id": "event-innovision-2026",
+      "from_id": "sponsor-aster",
+      "relation": "SPONSORS",
+      "to_id": "event-innovision-2026",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-aster"
+      ],
+      "valid_from": "2026-10-20T11:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-brightline-event",
+      "event_id": "event-innovision-2026",
+      "from_id": "sponsor-brightline",
+      "relation": "SPONSORS",
+      "to_id": "event-innovision-2026",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-brightline"
+      ],
+      "valid_from": "2026-10-22T14:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-corvex-event",
+      "event_id": "event-innovision-2026",
+      "from_id": "sponsor-corvex",
+      "relation": "SPONSORS",
+      "to_id": "event-innovision-2026",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-corvex"
+      ],
+      "valid_from": "2026-10-23T09:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-aster-commitment",
+      "event_id": "event-innovision-2026",
+      "from_id": "sponsor-aster",
+      "relation": "HAS_COMMITMENT",
+      "to_id": "commitment-aster",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-aster"
+      ],
+      "valid_from": "2026-10-20T11:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-brightline-commitment",
+      "event_id": "event-innovision-2026",
+      "from_id": "sponsor-brightline",
+      "relation": "HAS_COMMITMENT",
+      "to_id": "commitment-brightline",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-brightline"
+      ],
+      "valid_from": "2026-10-22T14:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-corvex-commitment",
+      "event_id": "event-innovision-2026",
+      "from_id": "sponsor-corvex",
+      "relation": "HAS_COMMITMENT",
+      "to_id": "commitment-corvex",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-corvex"
+      ],
+      "valid_from": "2026-10-23T09:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-aster-budget",
+      "event_id": "event-innovision-2026",
+      "from_id": "commitment-aster",
+      "relation": "CONTRIBUTES_TO",
+      "to_id": "budget-innovision-2026",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-aster",
+        "evidence-tracker-budget-policy"
+      ],
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-brightline-budget",
+      "event_id": "event-innovision-2026",
+      "from_id": "commitment-brightline",
+      "relation": "CONTRIBUTES_TO",
+      "to_id": "budget-innovision-2026",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-brightline",
+        "evidence-tracker-budget-policy"
+      ],
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-corvex-budget",
+      "event_id": "event-innovision-2026",
+      "from_id": "commitment-corvex",
+      "relation": "CONTRIBUTES_TO",
+      "to_id": "budget-innovision-2026",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-corvex",
+        "evidence-tracker-budget-policy"
+      ],
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-aster-policy",
+      "event_id": "event-innovision-2026",
+      "from_id": "commitment-aster",
+      "relation": "QUALIFIES_UNDER",
+      "to_id": "policy-tiers-v1",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-aster",
+        "evidence-tracker-budget-policy",
+        "evidence-policy-tiers-body"
+      ],
+      "valid_from": "2026-10-20T11:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-brightline-policy",
+      "event_id": "event-innovision-2026",
+      "from_id": "commitment-brightline",
+      "relation": "QUALIFIES_UNDER",
+      "to_id": "policy-tiers-v1",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-brightline",
+        "evidence-tracker-budget-policy",
+        "evidence-policy-tiers-body"
+      ],
+      "valid_from": "2026-10-22T14:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-corvex-policy",
+      "event_id": "event-innovision-2026",
+      "from_id": "commitment-corvex",
+      "relation": "QUALIFIES_UNDER",
+      "to_id": "policy-tiers-v1",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-corvex",
+        "evidence-tracker-budget-policy",
+        "evidence-policy-tiers-body"
+      ],
+      "valid_from": "2026-10-23T09:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-policy-D1",
+      "event_id": "event-innovision-2026",
+      "from_id": "policy-tiers-v1",
+      "relation": "ENTITLES_TO",
+      "to_id": "D1",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-policy-deliverables",
+        "evidence-policy-tiers-body"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-policy-D2",
+      "event_id": "event-innovision-2026",
+      "from_id": "policy-tiers-v1",
+      "relation": "ENTITLES_TO",
+      "to_id": "D2",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-policy-deliverables",
+        "evidence-policy-tiers-body"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-policy-D3",
+      "event_id": "event-innovision-2026",
+      "from_id": "policy-tiers-v1",
+      "relation": "ENTITLES_TO",
+      "to_id": "D3",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-policy-deliverables",
+        "evidence-policy-tiers-body"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-policy-D4",
+      "event_id": "event-innovision-2026",
+      "from_id": "policy-tiers-v1",
+      "relation": "ENTITLES_TO",
+      "to_id": "D4",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-policy-deliverables",
+        "evidence-policy-tiers-body"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-D1-document",
+      "event_id": "event-innovision-2026",
+      "from_id": "D1",
+      "relation": "DOCUMENTED_IN",
+      "to_id": "doc-aster-benefits",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-doc-D1"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-D2-document",
+      "event_id": "event-innovision-2026",
+      "from_id": "D2",
+      "relation": "DOCUMENTED_IN",
+      "to_id": "doc-aster-benefits",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-doc-D2"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-D3-document",
+      "event_id": "event-innovision-2026",
+      "from_id": "D3",
+      "relation": "DOCUMENTED_IN",
+      "to_id": "doc-aster-benefits",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-doc-D3"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-D4-benefits",
+      "event_id": "event-innovision-2026",
+      "from_id": "D4",
+      "relation": "DOCUMENTED_IN",
+      "to_id": "doc-aster-benefits",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-doc-D4"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-D4-run-sheet",
+      "event_id": "event-innovision-2026",
+      "from_id": "D4",
+      "relation": "DOCUMENTED_IN",
+      "to_id": "doc-run-sheet",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-doc-D4",
+        "evidence-run-sheet-D4"
+      ],
+      "valid_from": "2026-11-13T19:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-D1-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "D1",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-design",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-deliverables",
+        "evidence-aster-doc-D1"
+      ],
+      "valid_from": "2026-11-13T21:40:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-D2-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "D2",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-social",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-deliverables",
+        "evidence-aster-doc-D2"
+      ],
+      "valid_from": "2026-11-13T22:05:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-D3-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "D3",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-social",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-deliverables",
+        "evidence-aster-doc-D3"
+      ],
+      "valid_from": "2026-11-13T22:05:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-D4-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "D4",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-events",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-run-sheet-D4",
+        "evidence-tracker-deliverables"
+      ],
+      "valid_from": "2026-11-13T19:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-budget-document",
+      "event_id": "event-innovision-2026",
+      "from_id": "budget-innovision-2026",
+      "relation": "DOCUMENTED_IN",
+      "to_id": "doc-budget",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-budget-owner-sponsors",
+        "evidence-budget-expenses"
+      ],
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-budget-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "budget-innovision-2026",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-finance",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-budget-owner-sponsors"
+      ],
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-aster-package-decision",
+      "event_id": "event-innovision-2026",
+      "from_id": "doc-aster-benefits",
+      "relation": "REQUIRES_APPROVAL",
+      "to_id": "DEC-05",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-package-approval",
+        "evidence-tracker-dec05"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-DEC05-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "DEC-05",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-organizer",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-tracker-dec05"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-DEC07-budget",
+      "event_id": "event-innovision-2026",
+      "from_id": "DEC-07",
+      "relation": "CONTINGENT_ON",
+      "to_id": "budget-innovision-2026",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-budget-upgrade-condition"
+      ],
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-DEC07-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "DEC-07",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-finance",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-budget-upgrade-condition"
+      ],
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-DEC07-organizer",
+      "event_id": "event-innovision-2026",
+      "from_id": "DEC-07",
+      "relation": "REQUIRES_APPROVAL",
+      "to_id": "person-organizer",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-budget-upgrade-condition"
+      ],
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-policy-organizer",
+      "event_id": "event-innovision-2026",
+      "from_id": "policy-tiers-v1",
+      "relation": "REQUIRES_APPROVAL",
+      "to_id": "person-organizer",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-policy-tiers-body"
+      ],
+      "valid_from": "2026-10-19T15:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-aster-doc-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "doc-aster-benefits",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-events",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-aster-package-approval"
+      ],
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-run-sheet-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "doc-run-sheet",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-events",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-run-sheet-owner"
+      ],
+      "valid_from": "2026-11-13T19:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-budget-doc-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "doc-budget",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-finance",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-budget-owner-sponsors"
+      ],
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-brightline-doc-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "doc-brightline-benefits",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-events",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-brightline-benefits-body"
+      ],
+      "valid_from": "2026-11-12T17:00:00+05:30",
+      "valid_to": null
+    },
+    {
+      "edge_id": "edge-volunteer-owner",
+      "event_id": "event-innovision-2026",
+      "from_id": "cal-volunteer-briefing",
+      "relation": "ASSIGNED_TO",
+      "to_id": "person-events",
+      "provenance": "declared",
+      "evidence_ids": [
+        "evidence-calendar-existing-body"
+      ],
+      "valid_from": "2026-11-12T18:00:00+05:30",
+      "valid_to": null
+    }
+  ]
+}
