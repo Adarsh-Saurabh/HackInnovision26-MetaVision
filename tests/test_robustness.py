@@ -200,8 +200,8 @@ def test_retry_exhaustion_stops_safely():
     sponsor_key = wf.plan["actions"][0]["op_key"]
     assert wf.action_status[sponsor_key] == "failed"
     assert wf.store.op_get(sponsor_key)["attempts"] == 3
-    with pytest.raises(RuntimeError):
-        wf.verify()
+    report = wf.verify()  # a stopped run can be verified, and must not report success
+    assert not report["ok"] and wf.stage == "verification_failed"
 
 
 # 11 --------------------------------------------------------------------------
