@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import copy
 import json
+import logging
 import sqlite3
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from collections.abc import Callable
 
 FIXTURES_DIR = Path(__file__).resolve().parent.parent / "data" / "fixtures"
 
@@ -37,7 +39,7 @@ KINDS: dict[str, tuple[str | None, str | None, str]] = {
 SCHEMA = """
 CREATE TABLE records (kind TEXT, id TEXT, version INTEGER, data TEXT, PRIMARY KEY (kind, id));
 CREATE TABLE history (seq INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT, id TEXT, version INTEGER,
-                      data TEXT, actor TEXT, reason TEXT, at TEXT, run TEXT DEFAULT 'current');
+                      data TEXT, actor TEXT, reason TEXT, at TEXT);
 CREATE TABLE ops (op_key TEXT PRIMARY KEY, tool TEXT, kind TEXT, target_id TEXT, args TEXT,
                   status TEXT, attempts INTEGER, receipt TEXT, updated_at TEXT);
 CREATE TABLE deliveries (seq INTEGER PRIMARY KEY AUTOINCREMENT, source_id TEXT, content_hash TEXT,
@@ -81,9 +83,7 @@ class Store:
         self._allowed: set[str] = set()
         self.graph_nodes: list[dict] = []
         self.graph_edges: list[dict] = []
-        self.inherited_from: str | None = None       # parent run recalled from long-term memory
-        self.inherited_keys: set[tuple[str, str]] = set()
-        self.recalled_flags: list[str] = []
+        self.on_log: Callable[[dict], None] | None = None
 
     # ---------- seeding ----------
     @classmethod
@@ -155,8 +155,7 @@ class Store:
         return rec["version"]
 
     def history(self, kind: str | None = None, rid: str | None = None) -> list[dict]:
-        # Only this run's writes; rows recalled from long-term memory are kept separately (run='inherited').
-        q, args = "SELECT * FROM history WHERE actor != 'seed' AND run = 'current'", []
+        q, args = "SELECT * FROM history WHERE actor != 'seed'", []
         if kind:
             q, args = q + " AND kind=?", args + [kind]
         if rid:
@@ -175,48 +174,7 @@ class Store:
 
     def effect_count(self) -> int:
         """Number of non-seed record writes (used to prove replay adds zero effects)."""
-        return self.db.execute("SELECT COUNT(*) FROM history WHERE actor != 'seed' AND run = 'current'"
-                               ).fetchone()[0]
-
-    def inherited_history(self) -> list[dict]:
-        """Writes made by the parent run recalled from long-term memory."""
-        rows = self.db.execute("SELECT * FROM history WHERE actor != 'seed' AND run = 'inherited' "
-                               "ORDER BY seq").fetchall()
-        return [{**dict(r), "data": json.loads(r["data"])} for r in rows]
-
-    # ---------- long-term memory ----------
-    def snapshot(self, flags: list[str]) -> dict:
-        """Verified state of this run: current records, full history, ledger and visible sources."""
-        return {
-            "scenario_id": self.scenario["scenario_id"], "demo_now": self.demo_now, "flags": list(flags),
-            "records": [dict(r) for r in self.db.execute("SELECT * FROM records")],
-            "history": [dict(r) for r in self.db.execute(
-                "SELECT kind,id,version,data,actor,reason,at FROM history ORDER BY seq")],
-            "ops": [dict(r) for r in self.db.execute("SELECT * FROM ops")],
-            "active_sources": list(self._active),
-        }
-
-    def inherit(self, snap: dict) -> None:
-        """Start from a parent run's verified state instead of the baseline fixtures."""
-        self.db.execute("DELETE FROM records")
-        self.db.execute("DELETE FROM history")
-        for r in snap["records"]:
-            self.db.execute("INSERT INTO records VALUES (?,?,?,?)", (r["kind"], r["id"], r["version"], r["data"]))
-        for h in snap["history"]:
-            self.db.execute("INSERT INTO history (kind,id,version,data,actor,reason,at,run) VALUES (?,?,?,?,?,?,?,?)",
-                            (h["kind"], h["id"], h["version"], h["data"], h["actor"], h["reason"], h["at"],
-                             "inherited"))
-        for o in snap["ops"]:
-            self.db.execute("INSERT OR IGNORE INTO ops VALUES (?,?,?,?,?,?,?,?,?)",
-                            (o["op_key"], o["tool"], o["kind"], o["target_id"], o["args"], o["status"],
-                             o["attempts"], o["receipt"], o["updated_at"]))
-        for sid in snap["active_sources"]:
-            if sid in self._allowed and sid not in self._active:
-                self._active.append(sid)
-        self.db.commit()
-        self.inherited_from = snap["scenario_id"]
-        self.inherited_keys = {(r["kind"], r["id"]) for r in snap["records"]}
-        self.recalled_flags = list(snap["flags"])
+        return self.db.execute("SELECT COUNT(*) FROM history WHERE actor != 'seed'").fetchone()[0]
 
     # ---------- sources ----------
     def deliver(self, source_id: str) -> bool:
@@ -280,31 +238,18 @@ class Store:
 
     # ---------- action log ----------
     def log(self, agent: str, message: str, kind: str = "info", data: dict | None = None) -> None:
+        entry = {"at": _now(), "agent": agent, "kind": kind, "message": message, "data": data}
         self.db.execute("INSERT INTO log (at,agent,kind,message,data) VALUES (?,?,?,?,?)",
-                        (_now(), agent, kind, message,
+                        (entry["at"], agent, kind, message,
                          json.dumps(data, ensure_ascii=False, default=str) if data else None))
         self.db.commit()
+        if self.on_log:
+            try:
+                self.on_log(entry)
+            except Exception:
+                # A progress display must never interrupt a committed business operation.
+                logging.getLogger(__name__).exception("Progress display failed; workflow continues")
 
     def logs(self) -> list[dict]:
         rows = self.db.execute("SELECT * FROM log ORDER BY seq").fetchall()
         return [{**dict(r), "data": json.loads(r["data"]) if r["data"] else None} for r in rows]
-
-
-# ---------- long-term memory file (one row per verified run) ----------
-def save_memory(path: str, snap: dict) -> None:
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(path) as db:
-        db.execute("CREATE TABLE IF NOT EXISTS runs (scenario_id TEXT PRIMARY KEY, demo_now TEXT, saved_at TEXT, "
-                   "state TEXT)")
-        db.execute("INSERT OR REPLACE INTO runs VALUES (?,?,?,?)",
-                   (snap["scenario_id"], snap["demo_now"], _now(), json.dumps(snap, ensure_ascii=False)))
-
-
-def load_memory(path: str, scenario_id: str) -> dict | None:
-    if not Path(path).exists():
-        return None
-    with sqlite3.connect(path) as db:
-        db.execute("CREATE TABLE IF NOT EXISTS runs (scenario_id TEXT PRIMARY KEY, demo_now TEXT, saved_at TEXT, "
-                   "state TEXT)")
-        row = db.execute("SELECT state FROM runs WHERE scenario_id=?", (scenario_id,)).fetchone()
-    return json.loads(row[0]) if row else None

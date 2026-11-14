@@ -1,104 +1,36 @@
-# MetaVision · Second Brain
+# MetaVision - Second Brain
 
 HackInnovision 2026, Track B: Agentic Workflow Automation & Context Engineering.
 
-A college fest team keeps its work in email, team chat, a sponsor tracker, a budget sheet, docs and a calendar. When a key sponsor changes their money mid-way, a lot of other things must change too. Second Brain reads the sponsor's email, finds every record the change affects, writes a plan, asks a person to approve it, makes the changes (recovering from tool failures and teammates' edits), and then checks its own work.
+**Goal:** turn a sponsor commitment change into an evidence-backed impact plan, obtain human approval, update dependent event records, and verify the outcome even when a tool fails.
 
-All data is synthetic. The apps are simulated in SQLite; no real Gmail, Sheets or Calendar account is touched.
+## Start here
 
-## Run it
+- [Shared PC and skill setup](setup.md): consistent environment, Git workflow, Ponytail/Caveman installation and usage for every teammate.
+- [Detailed Project B blueprint](temp/PROJECT_B_BLUEPRINT.md): requirements, architecture, stack, memory, agents, reliability, implementation sequence, evaluation, and demo strategy.
+- [Complete system flowcharts](temp/PROJECT_B_SYSTEM_FLOWCHART.md): revision 2 visual workflow covering all six agents, mid-stream deliverables, corrections, scoped approval, adaptive replanning, recovery, outputs, and evaluation.
+- [Official problem statement](HackInnovision2026_PS.pdf): the source of the event requirements.
 
-Needs Python 3.12 and [uv](https://docs.astral.sh/uv/).
+## Repository status
 
-```bash
-uv sync --locked
-uv run python -m streamlit run app.py    # the demo UI, opens http://localhost:8501
-uv run pytest -q                         # 70 tests
-uv run python scripts/run_scenarios.py   # all 24 dataset scenarios vs expected outcomes
-```
+Planning and repository initialization only. No application, dependency environment, or integrations have been implemented yet. Features in the blueprint are proposed work, not existing functionality.
 
-Optional live AI reading of the email: copy `.env.example` to `.env`, set `GEMINI_API_KEY`, and turn on "Let Gemini AI read the email" in the sidebar. Without a key, everything runs offline on deterministic rules.
+Recommended first build: Python, LangGraph, SQLite, Pydantic, and Streamlit, with simulated email, tracker, document, and calendar tools. Add a live model after the deterministic workflow works.
 
-## The demo in 7 clicks
+Prototype scope: fabricate the cross-application dataset; defer Gmail, Sheets, and Calendar APIs. The blueprint adapts typed graph context and deterministic-rule patterns from the supplied uplan-ai analysis, while retaining source evidence and adding independent preflight checks, approvals, and verified execution. Prior application code is not included.
 
-| Step | Button | What you see |
-|---|---|---|
-| 1 | Deliver Priya's email | Aster Labs cuts its sponsorship from INR 100,000 to INR 60,000 |
-| 2 | Run the agents | Sponsor, amount and deadline extracted; impact map of every affected record |
-| 3 | Approve as organiser | 15-step plan, 4 items the AI refuses to decide alone, approval by scope |
-| 4 | Execute approved plan | Tracker fails once (503) and is retried safely; a teammate publishes a post at the same moment, so our write is refused |
-| 5 | Approve 6 changed actions | Plan v2: work already done is reused, only the 6 new or changed steps need approval |
-| 6 | Verify the results | Every changed record read back; budget recalculated: 21 checks pass |
-| 7 | Replay the email 10 times | 0 duplicate changes |
-| Run 2 | Start run 2 | Brightline raises its sponsorship. The run starts from run 1's verified state, loaded from long-term memory, and run 1's open questions are carried forward |
+## First implementation milestone
 
-The right-hand timeline shows every agent step, tool call, retry, conflict and approval as it happens.
+Build one vertical slice: synthetic email thread and team chat -> structured change -> dependency impact and deliverable classification -> preflight -> scoped approval -> idempotent updates -> read-back verification -> action ledger and agent timeline. Include a fail-once tracker write and a concurrent deliverable edit that triggers plan v2, delta re-approval, and reuse of completed effects. Prove that replay does not duplicate effects.
 
-## How it meets the brief
+## Event timing
 
-| Objective | Where it is shown |
-|---|---|
-| Extract entities (sponsor, amount, deadline, sender) | Communication agent, step 2; every value is checked against the email text |
-| Resolve cross-application dependencies | Knowledge agent, impact map and "How it spreads" tab: sponsor → commitment → tier → deliverables, docs, budget → DJ-upgrade decision |
-| Memory | Short-term: versioned records with full history, operations ledger and action log for the run. Long-term: every verified run is saved to `runtime/memory.sqlite`; run 2 recalls run 1's state, history and open questions (and refuses to run if no verified run 1 exists) |
-| Six specialised agents | Communication, Knowledge, Planning, Execution, Verification, Coordinator; each logs its own steps in the timeline |
-| Tool failure handled gracefully | Fail-once tracker error retried with the same idempotency key; a timeout after the write is reconciled without writing twice |
-| Idempotency | Every action has a key built from its exact content; replaying the email 10 times adds 0 effects |
-| Human approval for high-consequence actions | Three approval scopes: business records, internal notifications, sending to the sponsor (off by default; the reply stays a draft) |
-| Adaptive replanning | A teammate's concurrent edit causes a version conflict; nothing is overwritten; plan v2 plus re-approval of only the delta |
-| Verification checks | Independent read-back of every changed record, recomputed budget, unrelated records unchanged |
+The brief specifies November 14, 2026, midnight to noon. The timetable places submission and shortlisting at 9:30-10:00 AM, although the rules specify a noon deadline. Target a submission-ready build by 9:30 AM and confirm the operational cutoff with organizers. Times are interpreted as local event time (IST); the PDF does not state a timezone.
 
-## Architecture
+## Working conventions
 
-```
-email / chat ──► Coordinator ──► Communication ──► Knowledge ──► Planning ──► [human approval]
-                     │              extract +         graph          plan v1        │
-                     │              verify sender     traversal      flags          ▼
-                     │                                                         Execution ──► simulated apps
-                     │◄──────────── version conflict: replan (plan v2) ◄──────────┘    (tracker, docs,
-                     ▼                                                                   calendar, chat, email)
-               Verification ──► read back every record, recompute budget ──► summary, ledger, timeline
-```
-
-| Part | File |
-|---|---|
-| Agents (Communication, Knowledge, Planning, Verification) | `second_brain/agents.py` |
-| Coordinator + Execution: state machine, approvals, retries, replanning, replay | `second_brain/workflow.py` |
-| Simulated apps, fault injection, idempotent tool calls | `second_brain/tools.py` |
-| Versioned record store, history, ledger, action log, long-term memory (SQLite) | `second_brain/storage.py` |
-| Optional Gemini extraction, used only if grounded in the email and matching the rules | `second_brain/llm.py` |
-| UI | `app.py` |
-| Synthetic dataset: sources, sponsors, deliverables, decisions, docs, calendar, 24 scenarios, expected outcomes | `data/fixtures/` |
-
-Design choice: the agents are deterministic Python with clear role boundaries, and the language model is kept at the edge (reading the email). Money and approvals are never left to a guess; when the input is unclear the system stops and asks.
-
-## Measured results
-
-- `pytest`: 70 passed.
-- `scripts/run_scenarios.py`: **21 of 24 scenarios pass**, 0 fail, 3 are not tested.
-  - Passing includes: main demo, tool failure, concurrent edit, timeout after write, replay, rejection, rejected delta, unknown sender (blocked), tentative wording and unclear currency (asks for clarification), conflicting sponsor contacts, prompt injection in an email, unauthorised WhatsApp sender ignored, stale chat, tracker vs chat mismatch, Gmail unavailable and privacy-agent failure (fail closed), privacy scope (confidential sources never reach any agent).
-  - Also passes: `S2-brightline-inherited`, a second sponsor change that starts from run 1's verified state in long-term memory.
-  - Not tested: `S1-calendar-outage` (permanent outage and fallback approval not simulated), `S1-short-term-approval-resume` and `S1-short-term-partial-resume` (process restart not simulated).
-
-## Assumptions
-
-- Simulated apps and synthetic data, as the brief allows. Amounts are in INR, stored as paise.
-- A fixed demo clock (14 Nov 2026, 06:30 IST) so runs are reproducible.
-- The dependency graph between records is given by the dataset; the Knowledge agent also infers extra links from chat messages (drawn dashed in the impact map).
-- The organiser (Kavya) is the only approver.
-
-## Limitations
-
-- **Long-term memory is a snapshot store**, one record per verified run, not a searchable knowledge base.
-- **No restart recovery.** A run paused at approval does not survive a process restart.
-- **No separate preflight review** by the Verification agent before approval; the Coordinator's checks before planning take its place.
-- Plain Python state machine instead of LangGraph (the original plan); simpler to test within 12 hours.
-- Planning texts (team messages, sponsor reply) are most detailed for the main Aster scenario.
-- No real connectors; the live-adapter design is in the blueprint only.
-
-## More detail
-
-- [Demo plan and viva guide](docs/demo-plan-and-viva-guide.md)
-- [Project blueprint](temp/PROJECT_B_BLUEPRINT.md) and [system flowcharts](temp/PROJECT_B_SYSTEM_FLOWCHART.md)
-- [Problem statement](HackInnovision2026_PS.pdf)
-- [Team setup](setup.md)
+- Keep secrets in local environment variables or an ignored `.env`; never commit credentials or real attendee/sponsor data.
+- Keep synthetic fixtures separate from runtime state. Generated databases and temporary PDF renders are ignored.
+- Keep `temp/PROJECT_B_BLUEPRINT.md` tracked: the folder name does not make this document disposable.
+- Commit small, working increments. Document simulated connectors and known limits honestly.
+- Install and lock application dependencies when implementation starts; this planning commit does not claim a runnable setup.

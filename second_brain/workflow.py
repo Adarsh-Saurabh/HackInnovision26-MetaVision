@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from .agents import communication_agent, inr, knowledge_agent, planning_agent, verification_agent
-from .storage import Store, VersionConflict, load_memory, save_memory
+from .storage import Store, VersionConflict
 from .tools import ToolTimeout, Tools, TransientToolError
 
 MAX_ATTEMPTS = 3
@@ -23,10 +23,8 @@ DEFAULT_SCOPES = ("business_records", "internal_notifications")
 
 class Workflow:
     def __init__(self, scenario_id: str = "S1-main-demo", inject_faults: bool = True,
-                 db_path: str = ":memory:", fixtures_dir: Path | str | None = None, use_llm: bool = False,
-                 memory_path: str | None = None):
+                 db_path: str = ":memory:", fixtures_dir: Path | str | None = None, use_llm: bool = False):
         self.store = Store.from_fixtures(scenario_id, fixtures_dir, db_path)
-        self.memory_path = memory_path
         self.use_llm = use_llm
         self.tools = Tools(self.store, None if inject_faults else [])
         self.stage = "ready"
@@ -42,9 +40,6 @@ class Workflow:
         self.replay_result: dict | None = None
         self.clarification_questions: list[str] = []
         self._trigger: str | None = None
-        inh = self.store.scenario.get("inheritance")
-        if inh:
-            self._recall(inh["parent_scenario_id"])
 
     # ---------- helpers ----------
     @property
@@ -63,20 +58,6 @@ class Workflow:
         self._log(f"Clarification {source_id} received; re-running analysis on it", "trigger")
         self.stage = "ingested"
         return self.analyze()
-
-    def _recall(self, parent_id: str) -> None:
-        """Long-term memory: start from the parent run's VERIFIED state, or refuse to run."""
-        snap = load_memory(self.memory_path, parent_id) if self.memory_path else None
-        if not snap or snap["demo_now"] > self.store.demo_now:
-            self.stage = "blocked"
-            self._log(f"Long-term memory has no verified run of {parent_id} before this one; "
-                      "refusing to guess its state", "blocked")
-            return
-        self.store.inherit(snap)
-        s = self.store.get("sponsor", "sponsor-aster") or {}
-        self._log(f"Long-term memory: recalled verified run {parent_id} "
-                  f"({len(self.store.inherited_history())} past changes; Aster now {inr(s.get('commitment_paise'))} "
-                  f"{s.get('tier')}; {len(snap['flags'])} open human matters)", "trigger")
 
     def _log(self, message: str, kind: str = "info", data: dict | None = None) -> None:
         self.store.log("Coordinator", message, kind, data)
@@ -386,12 +367,8 @@ class Workflow:
         self.verification = report
         ok = report["ok"]
         self.stage = "verified" if ok else "verification_failed"
-        if ok and self.memory_path:
-            save_memory(self.memory_path, self.store.snapshot(self.plan["flags"]))
-            self._log(f"Saved this verified run to long-term memory ({self.store.scenario['scenario_id']})", "info")
         self._log(f"Verification {'passed' if ok else 'FAILED'}: {self.verification['passed']} checks passed, "
-                  f"{self.verification['failed']} failed (record read-backs plus one check that every approved "
-                  "action ran)", "verified" if ok else "error")
+                  f"{self.verification['failed']} failed", "verified" if ok else "error")
         return self.verification
 
     def replay(self, deliveries: int = 3) -> dict:

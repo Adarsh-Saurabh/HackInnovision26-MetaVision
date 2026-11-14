@@ -539,40 +539,27 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
                 dispositions[did] = "flag_human"
     dispositions = dict(sorted(dispositions.items()))
 
-    # Flags are read by the organiser at the approval step, so they are written in plain English.
     for did, disp in dispositions.items():
         d = store.get("deliverable", did) or {}
-        what = d.get("kind", "item").replace("_", " ")
         if disp == "flag_human" and d.get("kind") == "main_stage_banner_logo":
-            flags.append(f"{did} (main-stage banner logo) is already at the printer and cannot be undone, but "
-                         f"{tier_after} sponsors don't get it. A person must decide what to do.")
+            flags.append(f"{did} irreversible main-stage print order needs a human decision.")
         elif disp == "flag_human":
-            flags.append(f"{did} ({what}) cannot be undone, but the {tier_after} level does not include it. "
-                         "A person must decide what to do.")
+            flags.append(f"{did} is irreversible and exceeds {tier_after} entitlements; needs a human decision.")
         elif disp == "over_delivery":
-            flags.append(f"{did} ({what}) was already published by a teammate. {tier_after} sponsors get only "
-                         f"one post, so this is one extra. It cannot be undone, so it is flagged, not deleted.")
+            flags.append(f"{did} was externally delivered beyond {tier_after}'s one-post entitlement and cannot be undone.")
 
     forecast = fin_after["forecast_balance_paise"]
     if forecast < 0:
-        flags.append(f"After this change the budget is short by {inr(-forecast)}. The AI will not invent cost "
-                     "cuts; the team must decide.")
+        flags.append(f"Forecast deficit is INR {abs(forecast) // 100}; no invented expense cuts.")
     dec07 = store.get("decision", "DEC-07") if "DEC-07" in impact["decisions"] else None
     dec07_at_risk = bool(dec07 and dec07.get("condition")
                          and forecast < dec07["condition"]["threshold_paise"])
     if dec07_at_risk:
-        flags.append(f"The DJ upgrade (decision DEC-07) only goes ahead if at least "
-                     f"{inr(dec07['condition']['threshold_paise'])} is left over. Now {inr(forecast)} is left, "
-                     "so it is marked 'at risk' until someone decides.")
+        flags.append("DEC-07 remains at_risk with a false condition.")
     if ent.get("sponsor_wall_banner_logo") and not any(d["kind"] == "sponsor_wall_banner_logo" for d in deliverables):
-        flags.append(f"{tier_after} sponsors should get a logo on the sponsor wall, but no such item exists yet. "
-                     "The AI has not ordered a new print.")
+        flags.append(f"{tier_after} sponsor-wall coverage remains unresolved, with no replacement print action.")
     if tier_after is None:
-        flags.append("The new amount is below every sponsor level, so the level is unclear. A person must decide.")
-    for f in getattr(store, "recalled_flags", []):
-        if "short by" in f or any(f[:30] == g[:30] for g in flags):
-            continue   # a past deficit is history; a re-evaluated item is replaced by its current flag
-        flags.append(f"Still open from the earlier verified run (long-term memory): {f}")
+        flags.append("Revised commitment is below every tier minimum; tier unresolved.")
 
     unresolved = []
     if any(v in ("flag_human", "over_delivery") for v in dispositions.values()):
@@ -702,23 +689,7 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
             summary=f"{benefits.get('title', 'Benefits doc')}: rewrite D1–D4 entries for {tier_after}")
         business.append(a_benefits)
 
-    for doc_id in impact["documents"]:
-        doc = store.get("document", doc_id) or {}
-        if (doc_id == "doc-aster-benefits" or not tier_before or tier_before == tier_after
-                or any(a["target_id"] == doc_id for a in actions)):
-            continue
-        own = [e for e in doc.get("entries", []) if e.get("sponsor_id") == sponsor_id]
-        if own and any(tier_before in e.get("text", "") for e in own):
-            new_entries = [{**e, "text": e["text"].replace(tier_before, tier_after)}
-                           if e.get("sponsor_id") == sponsor_id else dict(e) for e in doc["entries"]]
-            business.append(add_action(
-                "update_document", "document", doc_id, {"entries": new_entries}, depends_on=[a_sponsor],
-                reason=f"{sponsor_name}'s benefits entries must name the {tier_after} level; new entitlements stay "
-                       "proposed, not delivered.",
-                summary=f"{doc.get('title', doc_id)}: {tier_before} → {tier_after} wording"))
-
-    review_inherited = ("calendar", "cal-sponsor-review") in getattr(store, "inherited_keys", set())
-    a_cal = None if review_inherited else add_action(
+    a_cal = add_action(
         "create_calendar_item", "calendar", "cal-sponsor-review",
         {"calendar_id": "cal-sponsor-review", "logical_key": "cal-sponsor-review",
          "title": f"Aster sponsorship review ({inr(new_paise)}, {tier_after})"
@@ -728,16 +699,10 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
         op="create", depends_on=[a_sponsor],
         reason="Organizer review of the revised package before the sponsor deadline.",
         summary="Calendar: sponsorship review 15 Nov 12:00 IST")
-    if a_cal:
-        business.append(a_cal)
+    business.append(a_cal)
 
     # ---- internal posts
-    d3_line = _d3_status_line(dispositions, store) if "D3" in impact["deliverables"] else ""
-    if impact["deliverables"]:
-        recipients = POST_RECIPIENTS
-    else:   # only documents/budget affected: tell their owners, never invent design/social work
-        owners = [(store.get("document", d) or {}).get("owner_id") for d in impact["documents"]]
-        recipients = [r for r in POST_RECIPIENTS if r in owners or r == "person-finance"]
+    d3_line = _d3_status_line(dispositions, store)
     deficit = f"forecast balance {inr(forecast)}"
     post_texts = {
         "person-design": (f"Heads-up: {sponsor_name} revised to {inr(new_paise)} ({tier_after}). D1 main-stage banner "
@@ -747,20 +712,15 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
                           f"satisfies it. {d3_line}"),
         "person-events": (f"{sponsor_name} is now {tier_after}: D4 stage mention cancelled and its run-sheet entry "
                           f"removed; welcome/housekeeping/closing entries unchanged. Sponsorship review booked "
-                          f"15 Nov 12:00 IST. {d3_line}") if impact["deliverables"] else
-                         (f"{sponsor_name} is now {tier_after} ({inr(new_paise)}). Their benefits document now says "
-                          f"{tier_after}; the new {tier_after} entitlements are proposed work, not delivered yet."),
+                          f"15 Nov 12:00 IST. {d3_line}"),
         "person-finance": (f"{sponsor_name} commitment revised {inr(proposal.get('old_paise'))} → {inr(new_paise)}; "
                            f"{deficit}. DEC-07 marked at_risk (condition false); no expense cuts invented. {d3_line}"),
     }
     post_ids = []
-    for pid in recipients:
-        post_id = f"post-{pid}"
-        if ("post", post_id) in getattr(store, "inherited_keys", set()):
-            post_id = f"{post_id}-{sponsor_id.removeprefix('sponsor-')}"
+    for pid in POST_RECIPIENTS:
         post_ids.append(add_action(
-            "post_internal", "post", post_id,
-            {"post_id": post_id, "recipient_id": pid, "channel": "team_chat", "text": post_texts[pid].strip()},
+            "post_internal", "post", f"post-{pid}",
+            {"post_id": f"post-{pid}", "recipient_id": pid, "channel": "team_chat", "text": post_texts[pid]},
             op="create", scope="internal_notifications", reversible=False, depends_on=list(business),
             reason="Owner of an affected item must be informed after business records are read back.",
             summary=f"Notify {_person_name(store, pid)}"))
@@ -778,17 +738,10 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
             f"The main-stage banner (D1) was already in production before your note; our organizer will confirm how "
             f"we handle it. {d3_sponsor}\n\nThe revised package is pending organizer approval, and we will confirm "
             f"once it is approved.\n\nRegards,\nKavya Iyer\nInnovision Campus Fest 2026")
-    if sponsor_id != "sponsor-aster":
-        body = (f"Hello {priya},\n\nThank you for letting us know. Here is the updated benefits proposal for "
-                f"{sponsor_name} at {inr(new_paise)}, which qualifies for the {tier_after} tier. The new "
-                f"{tier_after} benefits are proposed and will be confirmed once our organiser approves them.\n\n"
-                "Regards,\nKavya Iyer\nInnovision Campus Fest 2026")
     subject = f"Updated {sponsor_name} benefits proposal"
-    short = "aster" if sponsor_id == "sponsor-aster" else sponsor_id.removeprefix("sponsor-")
-    draft_id, sent_id = f"draft-{short}-reply", f"sent-{short}-reply"
     a_draft = add_action(
-        "create_draft", "draft", draft_id,
-        {"draft_id": draft_id, "to_contact_id": proposal.get("contact_id"),
+        "create_draft", "draft", "draft-aster-reply",
+        {"draft_id": "draft-aster-reply", "to_contact_id": proposal.get("contact_id"),
          "subject": subject, "body": body, "sent": False},
         op="create", scope="business_records", reversible=True,
         depends_on=[x for x in (a_sponsor, a_benefits) if x],
@@ -797,8 +750,8 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
     # Sending is a separate action in its own scope: it only runs if 'sponsor_send' is approved,
     # and the exact body is part of its identity, so a changed v2 reply needs fresh approval.
     add_action(
-        "send_email", "outbox", sent_id,
-        {"message_id": sent_id, "draft_id": draft_id,
+        "send_email", "outbox", "sent-aster-reply",
+        {"message_id": "sent-aster-reply", "draft_id": "draft-aster-reply",
          "to_contact_id": proposal.get("contact_id"), "subject": subject, "body": body},
         op="create", scope="sponsor_send", reversible=False, depends_on=[a_draft],
         reason="Deliver the approved reply to the sponsor contact.",
@@ -845,8 +798,7 @@ def verification_agent(store: "Store", plan: dict, receipts: dict[str, dict]) ->
                     if (receipts.get(a["op_key"]) or {}).get("status") in ("committed", "reused")}
 
     fin = compute_financials(store)
-    active = next((a["target_id"] for a in plan["actions"] if a["kind"] == "sponsor"), "sponsor-aster")
-    if active in done_targets:
+    if "sponsor-aster" in done_targets:
         check("financials recomputed", fin == plan["financials"],
               f"forecast {inr(fin['forecast_balance_paise'])} vs plan "
               f"{inr(plan['financials']['forecast_balance_paise'])}")
@@ -867,15 +819,12 @@ def verification_agent(store: "Store", plan: dict, receipts: dict[str, dict]) ->
           else f"missing {missing} changed {changed}")
 
     for sid, expected in OTHER_SPONSOR_COMMITMENTS.items():
-        if sid == active:
-            continue
         s = store.get("sponsor", sid) or {}
         check(f"{sid} commitment unchanged", s.get("commitment_paise") == expected,
               f"{inr(s.get('commitment_paise'))} (expected {inr(expected)})")
 
     reviews = [c for c in store.list("calendar") if c.get("logical_key") == "cal-sponsor-review"]
-    want = 1 if ("cal-sponsor-review" in done_targets
-                 or ("calendar", "cal-sponsor-review") in getattr(store, "inherited_keys", set())) else 0
+    want = 1 if "cal-sponsor-review" in done_targets else 0
     check(f"exactly {want} sponsor review calendar item", len(reviews) == want, f"found {len(reviews)}")
     check("cal-volunteer-briefing still present", store.get("calendar", "cal-volunteer-briefing") is not None)
 
@@ -885,9 +834,8 @@ def verification_agent(store: "Store", plan: dict, receipts: dict[str, dict]) ->
     for c in checks:
         if not c["ok"]:
             store.log("Verification", f"FAILED {c['name']}: {c['detail']}", "error")
-    store.log("Verification", f"Read-back of changed records {'passed' if failed == 0 else 'FAILED'}: "
+    store.log("Verification", f"Read-back {'passed' if failed == 0 else 'FAILED'}: "
                               f"{report['passed']} passed, {failed} failed"
-                              + (f"; {len(skipped)} planned action(s) not run because they were not approved "
-                                 f"or not reached ({', '.join(skipped)})" if skipped else "") + ".",
+                              + (f", {len(skipped)} actions not executed" if skipped else "") + ".",
               "verify" if failed == 0 else "error")
     return report
