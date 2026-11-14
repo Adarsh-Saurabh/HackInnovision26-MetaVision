@@ -2,7 +2,7 @@
 
 Use this guide on every teammate's computer. Standardize the project environment, Git workflow, and AI assistance without copying anyone's credentials or machine-specific settings.
 
-**Current state:** this repository contains planning documents, not a runnable application. Python dependencies, `pyproject.toml`, `uv.lock`, tests, and `app.py` have not been created. Sections marked **after implementation starts** must wait for those files.
+**Current state:** the prototype is implemented (`app.py`, `second_brain/`, `tests/`, committed `pyproject.toml` and `uv.lock`). See [README.md](README.md) for run commands. Sections below marked **after implementation starts** now apply.
 
 ## 1. Team defaults
 
