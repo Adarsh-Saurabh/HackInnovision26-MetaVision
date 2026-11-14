@@ -93,9 +93,10 @@ class Workflow:
             if a["op_key"] not in keys:
                 self.action_status[a["op_key"]] = "not_approved"
         self.stage = "approved"
-        self._log(f"Plan v1 approved by organiser for scopes: {', '.join(scopes)}. "
-                  "Sponsor send not selected, so the reply stays a draft.", "approval",
-                  {"approved_actions": len(keys)})
+        note = ("" if "sponsor_send" in scopes else
+                " Sponsor send not selected, so any sponsor reply stays an unsent draft.")
+        self._log(f"Plan v1 approved by organiser for scopes: {', '.join(scopes) or 'none'}.{note}",
+                  "approval", {"approved_actions": len(keys)})
 
     def reject(self, approver_id: str = "person-organizer") -> None:
         self._require("awaiting_approval", "awaiting_delta_approval")
@@ -113,12 +114,18 @@ class Workflow:
         self._log(f"Execution agent running {plan['plan_id']}", "route")
         done = {a["action_id"] for a in plan["actions"]
                 if self.action_status.get(a["op_key"]) in ("committed", "reused")}
+        read_back_done = False
         for a in plan["actions"]:
             key = a["op_key"]
             if key not in self.approved_keys:
                 continue
             if self.action_status.get(key) in ("committed", "reused"):
                 continue
+            if a["scope"] == "internal_notifications" and not read_back_done:
+                read_back_done = True
+                if not self._read_back_business(plan):
+                    self.stage = "failed"
+                    return self.stage
             missing = [d for d in a.get("depends_on", []) if d not in done]
             if missing:
                 self.action_status[key] = "blocked"
@@ -147,6 +154,23 @@ class Workflow:
         self.stage = "executed"
         self._log(f"{plan['plan_id']} executed; routing to Verification agent", "route")
         return self.stage
+
+    def _read_back_business(self, plan: dict) -> bool:
+        """Before notifying people, confirm committed business records really hold the planned values."""
+        bad = []
+        n = 0
+        for a in plan["actions"]:
+            if a["scope"] != "business_records" or self.action_status.get(a["op_key"]) not in ("committed", "reused"):
+                continue
+            n += 1
+            rec = self.store.get(a["kind"], a["target_id"]) or {}
+            if any(rec.get(k) != v for k, v in a["changes"].items()):
+                bad.append(a["target_id"])
+        if bad:
+            self._log(f"Read-back mismatch on {', '.join(bad)}; internal posts held back", "error")
+            return False
+        self._log(f"Read back {n} committed business records: all match. Releasing internal posts.", "verify")
+        return True
 
     def _handle_conflict(self, action: dict, exc: VersionConflict) -> str:
         old = self.plan
@@ -197,8 +221,17 @@ class Workflow:
 
     def verify(self) -> dict:
         self._require("executed", "verified")
-        self.verification = verification_agent(self.store, self.plan, self.receipts)
-        ok = self.verification["ok"]
+        report = verification_agent(self.store, self.plan, self.receipts)
+        not_run = [a["action_id"] for a in self.plan["actions"] if a["op_key"] in self.approved_keys
+                   and self.action_status.get(a["op_key"]) not in ("committed", "reused")]
+        report["checks"].append({"name": "every approved action executed", "ok": not not_run,
+                                 "detail": "all approved actions committed" if not not_run
+                                 else f"approved but not executed: {', '.join(not_run)}"})
+        report["failed"] = sum(1 for c in report["checks"] if not c["ok"])
+        report["passed"] = len(report["checks"]) - report["failed"]
+        report["ok"] = report["failed"] == 0
+        self.verification = report
+        ok = report["ok"]
         self.stage = "verified" if ok else "verification_failed"
         self._log(f"Verification {'passed' if ok else 'FAILED'}: {self.verification['passed']} checks passed, "
                   f"{self.verification['failed']} failed", "verified" if ok else "error")
@@ -206,7 +239,7 @@ class Workflow:
 
     def replay(self, deliveries: int = 3) -> dict:
         """Redeliver the trigger message and re-run the approved plan: must add zero effects."""
-        self._require("verified", "executed")
+        self._require("verified", "executed", "verification_failed")
         before = self.store.effect_count()
         ignored = 0
         for _ in range(deliveries):
@@ -216,7 +249,9 @@ class Workflow:
                   f"{ignored} recognised as duplicates", "replay")
         reused = 0
         for a in self.plan["actions"]:
-            if a["op_key"] in self.approved_keys:
+            prior = self.store.op_get(a["op_key"])
+            # Only previously committed operations are re-issued; anything never executed stays untouched.
+            if a["op_key"] in self.approved_keys and prior and prior["status"] == "committed":
                 if self.tools.execute(a)["status"] == "reused":
                     reused += 1
         after = self.store.effect_count()
@@ -225,6 +260,9 @@ class Workflow:
         self._log(f"Replay result: {reused} actions reused from ledger, {after - before} new effects", "replay",
                   self.replay_result)
         return self.replay_result
+
+    def close(self) -> None:
+        self.store.close()
 
     # ---------- convenience ----------
     def run_scripted(self) -> "Workflow":

@@ -228,3 +228,41 @@ def test_logs_are_unicode_and_json_safe():
         assert isinstance(row["agent"], str)
         json.loads(json.dumps(row, ensure_ascii=False))
     assert any("→" in r["message"] for r in logs)
+
+
+# Reviewer regressions -------------------------------------------------------
+def test_replay_never_executes_uncommitted_actions():
+    wf = Workflow()
+    wf.ingest(); wf.analyze()
+    wf.approve(["internal_notifications"])
+    assert wf.execute() == "executed"          # posts blocked: business deps never ran
+    assert wf.store.effect_count() == 0
+    assert wf.replay(1)["new_effects"] == 0
+
+
+def test_verify_fails_when_approved_actions_blocked():
+    wf = Workflow()
+    wf.ingest(); wf.analyze()
+    wf.approve(["internal_notifications"])
+    wf.execute()
+    report = wf.verify()
+    assert not report["ok"] and wf.stage == "verification_failed"
+    assert any(c["name"] == "every approved action executed" and not c["ok"] for c in report["checks"])
+
+
+def test_verify_passes_for_honest_noop_approval():
+    wf = Workflow()
+    wf.ingest(); wf.analyze()
+    wf.approve([])
+    wf.execute()
+    assert wf.verify()["ok"] and wf.stage == "verified"
+
+
+def test_delta_internal_only_is_not_falsely_verified():
+    wf = Workflow()
+    wf.ingest(); wf.analyze(); wf.approve()
+    assert wf.execute() == "awaiting_delta_approval"
+    wf.approve_delta(["internal_notifications"])
+    wf.execute()
+    assert not wf.verify()["ok"]
+    assert wf.replay(1)["new_effects"] == 0

@@ -159,6 +159,15 @@ class Store:
         rows = self.db.execute(q + " ORDER BY seq", args).fetchall()
         return [{**dict(r), "data": json.loads(r["data"])} for r in rows]
 
+    def baseline(self, kind: str, rid: str) -> dict | None:
+        """The seeded (pre-run) version of a record, for comparing against unintended changes."""
+        row = self.db.execute("SELECT data FROM history WHERE kind=? AND id=? AND actor='seed' "
+                              "ORDER BY seq LIMIT 1", (kind, rid)).fetchone()
+        return json.loads(row["data"]) if row else None
+
+    def close(self) -> None:
+        self.db.close()
+
     def effect_count(self) -> int:
         """Number of non-seed record writes (used to prove replay adds zero effects)."""
         return self.db.execute("SELECT COUNT(*) FROM history WHERE actor != 'seed'").fetchone()[0]

@@ -109,7 +109,8 @@ def test_delta_approval_only_for_changed_actions(wf):
 def test_sponsor_reply_is_draft_not_sent(wf):
     drafts = wf.store.list("draft")
     assert len(drafts) == 1 and drafts[0]["sent"] is False
-    assert "over" in json.dumps(drafts[0]).lower() or "published" in json.dumps(drafts[0]).lower()
+    body = drafts[0]["body"]
+    assert "has already been published" in body and "cancelled" not in body.lower()
 
 
 def test_internal_posts_reflect_v2(wf, oracle):
@@ -117,6 +118,13 @@ def test_internal_posts_reflect_v2(wf, oracle):
     assert {p["recipient_id"] for p in posts} == {
         "person-design", "person-social", "person-events", "person-finance"}
     assert all(p["version"] == 1 for p in posts)
+    for p in posts:
+        assert "published externally" in p["text"], p["recipient_id"]
+        assert "cancelled before publication" not in p["text"], p["recipient_id"]
+    msgs = [l["message"] for l in wf.store.logs()]
+    readback = next(i for i, m in enumerate(msgs) if m.startswith("Read back"))
+    first_post = next(i for i, m in enumerate(msgs) if "post_internal" in m and "committed" in m)
+    assert readback < first_post
 
 
 def test_replay_zero_duplicates(wf):

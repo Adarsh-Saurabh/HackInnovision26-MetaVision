@@ -777,18 +777,22 @@ def verification_agent(store: "Store", plan: dict, receipts: dict[str, dict]) ->
         check(f"{a['action_id']} {a['tool']} {a['target_id']}", not bad,
               "all fields match" if not bad else f"mismatch: {', '.join(bad)}")
 
+    done_targets = {a["target_id"] for a in plan["actions"]
+                    if (receipts.get(a["op_key"]) or {}).get("status") in ("committed", "reused")}
+
     fin = compute_financials(store)
-    check("financials recomputed", fin == plan["financials"],
-          f"forecast {inr(fin['forecast_balance_paise'])} vs plan {inr(plan['financials']['forecast_balance_paise'])}")
+    if "sponsor-aster" in done_targets:
+        check("financials recomputed", fin == plan["financials"],
+              f"forecast {inr(fin['forecast_balance_paise'])} vs plan "
+              f"{inr(plan['financials']['forecast_balance_paise'])}")
 
     run = store.get("document", "doc-run-sheet") or {}
     entries = run.get("entries", [])
-    check("run sheet has no D4 entry", not any(e.get("deliverable_id") == "D4" for e in entries),
-          f"{len(entries)} entries")
-    original = {}
-    for a in plan["actions"]:
-        if a["target_id"] == "doc-run-sheet" and a["tool"] == "update_document":
-            original = {e["entry_id"]: e for e in (a["before"].get("entries") or [])}
+    if "doc-run-sheet" in done_targets:
+        check("run sheet has no D4 entry", not any(e.get("deliverable_id") == "D4" for e in entries),
+              f"{len(entries)} entries")
+    seed = store.baseline("document", "doc-run-sheet") or {}
+    original = {e["entry_id"]: e for e in (seed.get("entries") or [])}
     current = {e["entry_id"]: e for e in entries}
     missing = [eid for eid in UNRELATED_RUN_ENTRIES if eid not in current]
     changed = [eid for eid in UNRELATED_RUN_ENTRIES
@@ -803,7 +807,8 @@ def verification_agent(store: "Store", plan: dict, receipts: dict[str, dict]) ->
               f"{inr(s.get('commitment_paise'))} (expected {inr(expected)})")
 
     reviews = [c for c in store.list("calendar") if c.get("logical_key") == "cal-sponsor-review"]
-    check("exactly one sponsor review calendar item", len(reviews) == 1, f"found {len(reviews)}")
+    want = 1 if "cal-sponsor-review" in done_targets else 0
+    check(f"exactly {want} sponsor review calendar item", len(reviews) == want, f"found {len(reviews)}")
     check("cal-volunteer-briefing still present", store.get("calendar", "cal-volunteer-briefing") is not None)
 
     failed = sum(1 for c in checks if not c["ok"])
