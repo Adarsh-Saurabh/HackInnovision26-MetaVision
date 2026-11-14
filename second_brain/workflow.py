@@ -368,7 +368,8 @@ class Workflow:
         ok = report["ok"]
         self.stage = "verified" if ok else "verification_failed"
         self._log(f"Verification {'passed' if ok else 'FAILED'}: {self.verification['passed']} checks passed, "
-                  f"{self.verification['failed']} failed", "verified" if ok else "error")
+                  f"{self.verification['failed']} failed (record read-backs plus one check that every approved "
+                  "action ran)", "verified" if ok else "error")
         return self.verification
 
     def replay(self, deliveries: int = 3) -> dict:

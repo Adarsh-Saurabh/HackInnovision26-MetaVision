@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 import time
 
 import streamlit as st
@@ -57,6 +58,16 @@ STATUS_LABEL = {"pending": "Waiting", "committed": "Done", "reused": "Already do
                 "stopped": "Stopped", "blocked": "Blocked", "not_approved": "Not approved", "failed": "Failed"}
 DELTA_LABEL = {"reuse": "Already done, not repeated", "covered": "Unchanged, already approved",
                "needs_approval": "New or changed, needs OK"}
+# Which part of the problem statement each step proves (shown above the step title).
+OBJECTIVE = {
+    "ready": "Brief: a key sponsor changes their commitment mid-way",
+    "ingested": "Objective 1 · pull out sponsor, amount and deadline from the email",
+    "awaiting_approval": "Objectives 1-3 · dependencies traced across apps, plan written, human approval",
+    "approved": "Objective 3 · tool failures handled with safe retries",
+    "awaiting_delta_approval": "Objective 3 · adaptive replanning when conditions change",
+    "executed": "Objective 3 · verification checks",
+    "verified": "Objective 3 · idempotency: repeats cause no duplicate changes",
+}
 DISPOSITION_LABEL = {"flag_human": "a person must decide", "satisfied": "already fine",
                      "cancel": "cancel it", "over_delivery": "promised too much"}
 
@@ -170,7 +181,7 @@ with st.sidebar:
     with st.expander("Words used on this screen"):
         for term, meaning in GLOSSARY:
             st.markdown(f"**{term}**: {meaning}")
-    st.caption(f"Demo clock: {store.demo_now.replace('T', ' ')[:16]} IST · stage `{wf.stage}`")
+    st.caption(f"Demo clock: {store.demo_now.replace('T', ' ')[11:16]} IST, {store.demo_now[:10]}")
 
 # ---------------------------------------------------------------- header + steps
 st.markdown('<div class="eyebrow">MetaVision · Second Brain</div>'
@@ -204,7 +215,7 @@ k[1].metric("Aster's sponsor level", aster["tier"],
 k[2].metric("Money left after costs", inr(fin["forecast_balance_paise"]),
             delta=inr(fin["forecast_balance_paise"] - 3000000) if fin["forecast_balance_paise"] != 3000000 else None,
             delta_color="off", help="All sponsor money promised, minus all planned expenses.")
-k[3].metric("DJ upgrade (DEC-07)", dec07["status"].replace("_", " "),
+k[3].metric("DJ upgrade decision", dec07["status"].replace("_", " "),
             help="A decision that only goes ahead if there is enough money left.")
 k[4].metric("Records changed", store.effect_count(), help="How many records the helpers have written to.")
 k[5].metric("Duplicate effects", wf.replay_result["new_effects"] if wf.replay_result else "–",
@@ -240,6 +251,22 @@ def change_text(a: dict) -> str:
                      f"{fmt_val(f, v)}" for f, v in a["changes"].items())
 
 
+def record_name(a: dict) -> str:
+    """Human name for an action's target record, falling back to its ID."""
+    rec = store.get(a["kind"], a["target_id"]) or a["changes"]
+    if a["kind"] == "post":
+        person = store.get("person", rec.get("recipient_id", "")) or {}
+        return f"Message to {person.get('name', rec.get('recipient_id'))}"
+    if a["kind"] == "deliverable":
+        return f"{a['target_id']} {rec.get('kind', '').replace('_', ' ')}"
+    if a["kind"] == "decision":
+        return f"{a['target_id']}: {rec.get('title', '')}"
+    for f in ("name", "title", "subject"):
+        if rec.get(f):
+            return str(rec[f])
+    return a["target_id"]
+
+
 def plan_rows(plan: dict, show_delta: bool) -> list[dict]:
     rows = []
     for a in plan["actions"]:
@@ -247,7 +274,7 @@ def plan_rows(plan: dict, show_delta: bool) -> list[dict]:
         if show_delta:
             row["Compared with v1"] = DELTA_LABEL.get(wf.delta.get(a["op_key"], ""), "")
         row.update({"Status": STATUS_LABEL.get(wf.action_status.get(a["op_key"], "pending"), ""),
-                    "App": APP_NAMES.get(a["kind"], a["kind"]), "Record": a["target_id"],
+                    "App": APP_NAMES.get(a["kind"], a["kind"]), "Record": record_name(a),
                     "What changes": change_text(a), "Approval group": SCOPE_LABEL.get(a["scope"], a["scope"]),
                     "Can undo?": "yes" if a["reversible"] else "NO"})
         rows.append(row)
@@ -325,6 +352,8 @@ with left:
     box = st.container(border=True)
     stage = wf.stage
     with box:
+        if stage in OBJECTIVE:
+            label(OBJECTIVE[stage])
         if stage == "ready":
             st.subheader("Step 1. An email is about to arrive")
             st.write("Aster Labs is one of the fest's main sponsors. Their contact, Priya, is about to email "
@@ -376,7 +405,7 @@ with left:
                 run_step(wf.reject)
         elif stage == "approved":
             p = wf.plan
-            st.subheader(f"Step 4. Make the approved changes ({p['plan_id']})")
+            st.subheader(f"Step 4. Make the approved changes (plan v{p['version']})")
             st.write("The Execution helper makes the changes one at a time. Before each write it checks that "
                      "nobody else changed the record. With 'Simulate problems' on, one app will fail once "
                      "and a teammate will edit a post at the same moment.")
@@ -444,8 +473,13 @@ with left:
     tabs = st.tabs(["How it spreads", "Plan", "Workspace apps", "Inbox", "Checks", "Action log"])
     with tabs[0]:
         if wf.impact:
-            st.caption("Each line is one chain of links, from the sponsor to something that has to change.")
-            st.markdown("\n".join(f"- `{p}`" for p in wf.impact["paths"]))
+            st.caption("Each line is one chain of links, from the sponsor to something that has to change. "
+                       "The same chains are drawn in the impact map above.")
+            names = {n["id"]: n["label"] for n in wf.impact["nodes"]}
+            pattern = re.compile("|".join(re.escape(i) for i in sorted(names, key=len, reverse=True)))
+            st.markdown("\n".join(
+                "- " + html.escape(pattern.sub(lambda m: names[m.group(0)], p)) for p in wf.impact["paths"]),
+                unsafe_allow_html=True)
         else:
             st.caption("Run the agents to see how the change spreads.")
     with tabs[1]:
@@ -507,20 +541,28 @@ with left:
                         f'{html.escape(s["body"])}</div>', unsafe_allow_html=True)
     with tabs[4]:
         if wf.verification:
+            st.caption("Each changed record is opened again and compared with what the plan said. "
+                       "Then the budget is recalculated and unrelated records are checked for accidental changes.")
+            summaries = {a["action_id"]: a.get("summary") for p in wf.plans for a in p["actions"]}
+
+            def check_name(name: str) -> str:
+                aid = name.split(" ", 1)[0]
+                return f"Step {aid}: {summaries[aid]}" if summaries.get(aid) else name
+
             st.markdown("".join(
                 f'<div class="check"><b class="{"pass" if c["ok"] else "fail"}">{"PASS" if c["ok"] else "FAIL"}</b>'
-                f'<b>{html.escape(c["name"])}</b> · {html.escape(str(c["detail"]))}</div>'
+                f'<b>{html.escape(check_name(c["name"]))}</b> · {html.escape(str(c["detail"]))}</div>'
                 for c in wf.verification["checks"]), unsafe_allow_html=True)
         else:
             st.caption("Not verified yet.")
         if wf.replay_result:
-            label("Repeat test, raw result")
-            st.json(wf.replay_result)
+            with st.expander("Repeat test, raw numbers"):
+                st.json(wf.replay_result)
     with tabs[5]:
         ops = store.ops()
         if ops:
-            st.dataframe([{"Action key": o["op_key"], "Tool": o["tool"], "Record": o["target_id"],
-                           "Result": o["status"], "Tries": o["attempts"]} for o in ops],
+            st.dataframe([{"App": APP_NAMES.get(o["kind"], o["kind"]), "Record": o["target_id"],
+                           "Result": o["status"], "Tries": o["attempts"], "Action key": o["op_key"]} for o in ops],
                          hide_index=True, width="stretch")
             st.caption("Every change gets a key made from exactly what it does. If the same key comes up again, "
                        "the helpers know it is already done and skip it. That is how repeats cause no damage.")

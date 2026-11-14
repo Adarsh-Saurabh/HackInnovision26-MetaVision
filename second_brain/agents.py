@@ -539,27 +539,36 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
                 dispositions[did] = "flag_human"
     dispositions = dict(sorted(dispositions.items()))
 
+    # Flags are read by the organiser at the approval step, so they are written in plain English.
     for did, disp in dispositions.items():
         d = store.get("deliverable", did) or {}
+        what = d.get("kind", "item").replace("_", " ")
         if disp == "flag_human" and d.get("kind") == "main_stage_banner_logo":
-            flags.append(f"{did} irreversible main-stage print order needs a human decision.")
+            flags.append(f"{did} (main-stage banner logo) is already at the printer and cannot be undone, but "
+                         f"{tier_after} sponsors don't get it. A person must decide what to do.")
         elif disp == "flag_human":
-            flags.append(f"{did} is irreversible and exceeds {tier_after} entitlements; needs a human decision.")
+            flags.append(f"{did} ({what}) cannot be undone, but the {tier_after} level does not include it. "
+                         "A person must decide what to do.")
         elif disp == "over_delivery":
-            flags.append(f"{did} was externally delivered beyond {tier_after}'s one-post entitlement and cannot be undone.")
+            flags.append(f"{did} ({what}) was already published by a teammate. {tier_after} sponsors get only "
+                         f"one post, so this is one extra. It cannot be undone, so it is flagged, not deleted.")
 
     forecast = fin_after["forecast_balance_paise"]
     if forecast < 0:
-        flags.append(f"Forecast deficit is INR {abs(forecast) // 100}; no invented expense cuts.")
+        flags.append(f"After this change the budget is short by {inr(-forecast)}. The AI will not invent cost "
+                     "cuts; the team must decide.")
     dec07 = store.get("decision", "DEC-07") if "DEC-07" in impact["decisions"] else None
     dec07_at_risk = bool(dec07 and dec07.get("condition")
                          and forecast < dec07["condition"]["threshold_paise"])
     if dec07_at_risk:
-        flags.append("DEC-07 remains at_risk with a false condition.")
+        flags.append(f"The DJ upgrade (decision DEC-07) only goes ahead if at least "
+                     f"{inr(dec07['condition']['threshold_paise'])} is left over. Now {inr(forecast)} is left, "
+                     "so it is marked 'at risk' until someone decides.")
     if ent.get("sponsor_wall_banner_logo") and not any(d["kind"] == "sponsor_wall_banner_logo" for d in deliverables):
-        flags.append(f"{tier_after} sponsor-wall coverage remains unresolved, with no replacement print action.")
+        flags.append(f"{tier_after} sponsors should get a logo on the sponsor wall, but no such item exists yet. "
+                     "The AI has not ordered a new print.")
     if tier_after is None:
-        flags.append("Revised commitment is below every tier minimum; tier unresolved.")
+        flags.append("The new amount is below every sponsor level, so the level is unclear. A person must decide.")
 
     unresolved = []
     if any(v in ("flag_human", "over_delivery") for v in dispositions.values()):
@@ -834,8 +843,9 @@ def verification_agent(store: "Store", plan: dict, receipts: dict[str, dict]) ->
     for c in checks:
         if not c["ok"]:
             store.log("Verification", f"FAILED {c['name']}: {c['detail']}", "error")
-    store.log("Verification", f"Read-back {'passed' if failed == 0 else 'FAILED'}: "
+    store.log("Verification", f"Read-back of changed records {'passed' if failed == 0 else 'FAILED'}: "
                               f"{report['passed']} passed, {failed} failed"
-                              + (f", {len(skipped)} actions not executed" if skipped else "") + ".",
+                              + (f"; {len(skipped)} planned action(s) not run because they were not approved "
+                                 f"or not reached ({', '.join(skipped)})" if skipped else "") + ".",
               "verify" if failed == 0 else "error")
     return report
