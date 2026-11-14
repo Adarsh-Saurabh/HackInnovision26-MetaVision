@@ -13,7 +13,7 @@ Needs Python 3.12 and [uv](https://docs.astral.sh/uv/).
 ```bash
 uv sync --locked
 uv run python -m streamlit run app.py    # the demo UI, opens http://localhost:8501
-uv run python -m pytest -q               # 81 tests
+uv run pytest -q                         # 70 tests
 uv run python scripts/run_scenarios.py   # all 24 dataset scenarios vs expected outcomes
 ```
 
@@ -74,7 +74,7 @@ Design choice: the agents are deterministic Python with clear role boundaries, a
 
 ## Measured results
 
-- `pytest`: 81 passed.
+- `pytest`: 70 passed.
 - `scripts/run_scenarios.py`: **21 of 24 scenarios pass**, 0 fail, 3 are not tested.
   - Passing includes: main demo, tool failure, concurrent edit, timeout after write, replay, rejection, rejected delta, unknown sender (blocked), tentative wording and unclear currency (asks for clarification), conflicting sponsor contacts, prompt injection in an email, unauthorised WhatsApp sender ignored, stale chat, tracker vs chat mismatch, Gmail unavailable and privacy-agent failure (fail closed), privacy scope (confidential sources never reach any agent).
   - Also passes: `S2-brightline-inherited`, a second sponsor change that starts from run 1's verified state in long-term memory.

@@ -1,19 +1,19 @@
-# Light workspace with restrained indigo accents.
+# Monochrome theme for the demo UI (white / black / grey only).
 [theme]
 base = "light"
-primaryColor = "#4F46E5"
-backgroundColor = "#F8FAFC"
-secondaryBackgroundColor = "#EEF2F8"
-textColor = "#172B4D"
-linkColor = "#4338CA"
-borderColor = "#DFE6F0"
-codeBackgroundColor = "#EEF2FF"
-baseRadius = "medium"
+primaryColor = "#111111"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F4F4F4"
+textColor = "#111111"
+linkColor = "#111111"
+borderColor = "#DADADA"
+codeBackgroundColor = "#F4F4F4"
+baseRadius = "small"
 font = "IBM Plex Sans:https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
 codeFont = "IBM Plex Mono:https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
 
 [theme.sidebar]
-backgroundColor = "#F0F4FA"
+backgroundColor = "#F4F4F4"
 
 [client]
 toolbarMode = "viewer"
