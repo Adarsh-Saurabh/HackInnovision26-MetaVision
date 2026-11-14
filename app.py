@@ -130,9 +130,6 @@ k[5].metric("Duplicate effects", wf.replay_result["new_effects"] if wf.replay_re
 if err := st.session_state.pop("error", None):
     st.error(err)
 
-left, right = st.columns([3, 2], gap="large")
-
-
 # ---------------------------------------------------------------- helpers
 def fmt_val(field: str, v) -> str:
     if v is None:
@@ -173,8 +170,8 @@ def graph_dot() -> str:
     imp = wf.impact
     disp = wf.plan["dispositions"] if wf.plan else {}
     lines = ['digraph G { rankdir=LR; bgcolor="transparent"; nodesep=0.25; ranksep=0.5;',
-             'node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, color="#495057"];',
-             'edge [fontname="Helvetica", fontsize=8, color="#868e96", fontcolor="#868e96"];']
+             'node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, color="#495057"];',
+             'edge [fontname="Helvetica", fontsize=9, color="#868e96", fontcolor="#868e96"];']
     for n in imp["nodes"]:
         nid = n["id"]
         fill = "#e9ecef"
@@ -219,6 +216,15 @@ def record_table(kind: str, fields: list[str]) -> None:
     else:
         st.caption("Nothing here yet.")
 
+
+# ---------------------------------------------------------------- full-width impact graph
+if wf.impact:
+    with st.expander("🕸 Impact graph: what this one email touches", expanded=True):
+        st.graphviz_chart(graph_dot(), width="stretch")
+        st.caption("Blue = affected · yellow = needs human · red = cancelled / deficit / over-delivery · "
+                   "green = satisfied · dashed purple = link inferred from chat · grey = context, not affected")
+
+left, right = st.columns([3, 2], gap="large")
 
 # ---------------------------------------------------------------- left: next step + details
 with left:
@@ -317,18 +323,14 @@ with left:
                 new_workflow()
                 st.rerun()
 
-    tabs = st.tabs(["🕸 Impact graph", "🗺 Plan", "🗂 Workspace apps", "📥 Inbox", "🔍 Verification",
+    tabs = st.tabs(["🧭 Dependency paths", "🗺 Plan", "🗂 Workspace apps", "📥 Inbox", "🔍 Verification",
                     "📒 Ledger"])
     with tabs[0]:
         if wf.impact:
-            st.graphviz_chart(graph_dot(), width="stretch")
-            st.caption("Blue = affected · yellow = needs human · red = cancelled / deficit / over-delivery · "
-                       "green = satisfied · dashed purple = link inferred from chat")
-            with st.expander("Dependency paths found"):
-                for p in wf.impact["paths"]:
-                    st.markdown(f"- `{p}`")
+            for p in wf.impact["paths"]:
+                st.markdown(f"- `{p}`")
         else:
-            st.caption("Run the agents to see the impact graph.")
+            st.caption("Run the agents to see how the change spreads.")
     with tabs[1]:
         if wf.plans:
             for p in reversed(wf.plans):
