@@ -11,6 +11,7 @@ import time
 
 import streamlit as st
 
+from second_brain import llm
 from second_brain.agents import compute_financials, inr
 from second_brain.tools import APP_NAMES
 from second_brain.workflow import Workflow
@@ -22,7 +23,7 @@ AGENT_ICON = {"Communication": "📨", "Knowledge": "🧠", "Planning": "🗺️
 KIND_COLOR = {"error": "#d9534f", "conflict": "#e8590c", "retry": "#f0ad4e", "write": "#2f9e44",
               "reuse": "#868e96", "approval": "#1c7ed6", "verified": "#2f9e44", "verify": "#2f9e44",
               "external": "#c2255c", "flag": "#f08c00", "trigger": "#7048e8", "blocked": "#d9534f",
-              "replay": "#0c8599", "inference": "#7048e8"}
+              "replay": "#0c8599", "inference": "#7048e8", "llm": "#7048e8"}
 STEPS = [("Message in", {"ready"}),
          ("Agents analyse", {"ingested"}),
          ("Human approval", {"awaiting_approval"}),
@@ -83,6 +84,13 @@ with st.sidebar:
     st.toggle("Inject faults (tracker failure + teammate edit)", value=True, key="faults",
               help="Applies on reset.")
     st.toggle("Animate agent timeline", value=True, key="animate")
+    st.toggle(f"Live Gemini extraction ({llm.model_name()})", value=llm.live_default(), key="llm",
+              disabled=not llm.live_available(),
+              help="Gemini interprets the email; its answer is only used if it is grounded in the message "
+                   "text and matches the rule-based extraction. Off = rules only, no API calls."
+                   + ("" if llm.live_available() else " No GEMINI_API_KEY in .env."))
+    if wf.stage in ("ready", "ingested"):
+        wf.use_llm = bool(st.session_state.get("llm")) and llm.live_available()
     if st.button("↺ Reset demo", width="stretch"):
         new_workflow()
         st.rerun()
@@ -249,6 +257,14 @@ with left:
             p = wf.plan
             st.subheader(f"3 · Plan v1 needs your approval ({len(p['actions'])} actions)")
             st.info(f"**{wf.proposal['summary']}**  \nNothing has been changed yet.")
+            info = wf.proposal.get("llm")
+            if info is None:
+                st.caption("🔎 Extracted by deterministic rules (live Gemini off)")
+            elif info["status"] == "agree":
+                st.caption(f"✨ Read by Gemini `{info['model']}`, checked against the message text and the "
+                           "rule-based extraction: they agree")
+            else:
+                st.caption(f"⚠️ Gemini result not used ({info['status']}); grounded rule-based extraction kept")
             for f in p["flags"]:
                 st.warning(f, icon="⚠️")
             st.dataframe(plan_rows(p, False), hide_index=True, width="stretch")

@@ -21,8 +21,9 @@ DEFAULT_SCOPES = ("business_records", "internal_notifications")
 
 class Workflow:
     def __init__(self, scenario_id: str = "S1-main-demo", inject_faults: bool = True,
-                 db_path: str = ":memory:", fixtures_dir: Path | str | None = None):
+                 db_path: str = ":memory:", fixtures_dir: Path | str | None = None, use_llm: bool = False):
         self.store = Store.from_fixtures(scenario_id, fixtures_dir, db_path)
+        self.use_llm = use_llm
         self.tools = Tools(self.store, None if inject_faults else [])
         self.stage = "ready"
         self.proposal: dict | None = None
@@ -65,6 +66,9 @@ class Workflow:
     def analyze(self) -> dict:
         self._require("ingested")
         self.proposal = communication_agent(self.store, self.trigger_id)
+        if self.use_llm:
+            from .llm import cross_check
+            self.proposal = cross_check(self.store, self.proposal)
         if not self.proposal.get("authorized"):
             self.stage = "blocked"
             self._log("Sender is not an authorised sponsor contact; no changes planned, "
