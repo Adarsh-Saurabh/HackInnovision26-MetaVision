@@ -1,0 +1,161 @@
+{
+  "schema_version": "metavision-fixtures/1",
+  "dataset_id": "dataset-innovision-2026-v1",
+  "documents": [
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T22:11:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-aster-package-approval",
+        "evidence-aster-policy-deliverables",
+        "evidence-aster-doc-D1",
+        "evidence-aster-doc-D2",
+        "evidence-aster-doc-D3",
+        "evidence-aster-doc-D4"
+      ],
+      "document_id": "doc-aster-benefits",
+      "title": "Aster Labs — Gold benefits package",
+      "owner_id": "person-events",
+      "source_id": "src-benefits-aster-v1",
+      "body": "Aster Labs — Gold benefits package, Innovision Campus Fest 2026\nOwner: Sana Ali, events lead. Final promotional package approval is pending under DEC-05 with organizer Kavya Iyer.\nThe event tier policy supplies Aster's Gold entitlements through D1 (main-stage banner logo), D2 (first social post), D3 (second social post), and D4 (stage mention).\nD1 is documented here as the Aster main-stage banner logo, PrintHub order PH-2231, in production with design lead Meera Kapoor.\nD2 is documented here as Aster's first social post, already live, owned by Rohan Das.\nD3 is documented here as Aster's second social post, scheduled for 16 November 2026 at 10:00 IST, owned by Rohan Das.\nD4 is documented here as Aster's stage mention; its programme wording is maintained in the stage run sheet by Sana Ali.\nThis is the existing Gold package, not an approval of any later proposal.",
+      "entries": [
+        {
+          "entry_id": "entry-aster-D1",
+          "sponsor_id": "sponsor-aster",
+          "deliverable_id": "D1",
+          "text": "D1 is documented here as the Aster main-stage banner logo, PrintHub order PH-2231, in production with design lead Meera Kapoor."
+        },
+        {
+          "entry_id": "entry-aster-D2",
+          "sponsor_id": "sponsor-aster",
+          "deliverable_id": "D2",
+          "text": "D2 is documented here as Aster's first social post, already live, owned by Rohan Das."
+        },
+        {
+          "entry_id": "entry-aster-D3",
+          "sponsor_id": "sponsor-aster",
+          "deliverable_id": "D3",
+          "text": "D3 is documented here as Aster's second social post, scheduled for 16 November 2026 at 10:00 IST, owned by Rohan Das."
+        },
+        {
+          "entry_id": "entry-aster-D4",
+          "sponsor_id": "sponsor-aster",
+          "deliverable_id": "D4",
+          "text": "D4 is documented here as Aster's stage mention; its programme wording is maintained in the stage run sheet by Sana Ali."
+        }
+      ]
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T19:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T19:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-run-sheet-owner",
+        "evidence-run-sheet-D4",
+        "evidence-run-sheet-welcome",
+        "evidence-run-sheet-housekeeping",
+        "evidence-run-sheet-closing"
+      ],
+      "document_id": "doc-run-sheet",
+      "title": "Innovision Campus Fest 2026 — stage run sheet",
+      "owner_id": "person-events",
+      "source_id": "src-run-sheet-v1",
+      "body": "Innovision Campus Fest 2026 — stage run sheet\nOwner: Sana Ali, events lead. Opening session: 21 November 2026, 10:00 IST.\nWelcome: introduce the student organizing team and outline the two-day programme.\nD4 — Aster Labs stage mention: Thank you to our Gold sponsor Aster Labs for supporting Innovision Campus Fest 2026. Sana Ali owns this planned stage mention.\nHousekeeping: remind guests to use the marked exits and refill stations.\nClosing note: announce the next session. The welcome and housekeeping entries are independent of sponsor benefits.",
+      "entries": [
+        {
+          "entry_id": "entry-run-welcome",
+          "sponsor_id": null,
+          "deliverable_id": null,
+          "text": "Welcome: introduce the student organizing team and outline the two-day programme."
+        },
+        {
+          "entry_id": "entry-run-D4",
+          "sponsor_id": "sponsor-aster",
+          "deliverable_id": "D4",
+          "text": "D4 — Aster Labs stage mention: Thank you to our Gold sponsor Aster Labs for supporting Innovision Campus Fest 2026. Sana Ali owns this planned stage mention."
+        },
+        {
+          "entry_id": "entry-run-housekeeping",
+          "sponsor_id": null,
+          "deliverable_id": null,
+          "text": "Housekeeping: remind guests to use the marked exits and refill stations."
+        },
+        {
+          "entry_id": "entry-run-closing",
+          "sponsor_id": null,
+          "deliverable_id": null,
+          "text": "Closing note: announce the next session. The welcome and housekeeping entries are independent of sponsor benefits."
+        }
+      ]
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T20:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-budget-owner-sponsors",
+        "evidence-budget-expenses",
+        "evidence-budget-upgrade-condition"
+      ],
+      "document_id": "doc-budget",
+      "title": "Innovision Campus Fest 2026 — budget worksheet",
+      "owner_id": "person-finance",
+      "source_id": "src-budget-v1",
+      "body": "Innovision Campus Fest 2026 — budget worksheet\nOwner: Ishan Bose, finance lead. All amounts below are INR. Sponsor commitments are read from the sponsorship tracker; cash receipts are tracked separately. The budget includes the Aster Labs, Brightline Foods, and Corvex Systems commitments.\nPlanned expenses: venue and permits 65,000; base stage and sound 70,000; refreshments 45,000; printing and signage 25,000; volunteer logistics 15,000. These five lines are the complete planned expense list.\nDEC-07: DJ and sound upgrade, optional cost INR 25,000, remains pending with Ishan Bose for submission to organizer Kavya Iyer. DEC-07 is contingent on the Innovision event budget: approve only if forecast balance is at least INR 25,000. Forecast balance means the sum of sponsor commitments less the planned expenses, not cash in hand. The optional upgrade is not included in the planned expenses.\nNo upgrade purchase order has been placed.",
+      "entries": [
+        {
+          "entry_id": "entry-budget-expenses",
+          "sponsor_id": null,
+          "deliverable_id": null,
+          "text": "Planned expenses: venue and permits 65,000; base stage and sound 70,000; refreshments 45,000; printing and signage 25,000; volunteer logistics 15,000. These five lines are the complete planned expense list."
+        },
+        {
+          "entry_id": "entry-budget-DEC07",
+          "sponsor_id": null,
+          "deliverable_id": null,
+          "text": "DEC-07: DJ and sound upgrade, optional cost INR 25,000, remains pending with Ishan Bose for submission to organizer Kavya Iyer. DEC-07 is contingent on the Innovision event budget: approve only if forecast balance is at least INR 25,000. Forecast balance means the sum of sponsor commitments less the planned expenses, not cash in hand. The optional upgrade is not included in the planned expenses."
+        }
+      ]
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-12T17:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-12T17:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-brightline-benefits-body"
+      ],
+      "document_id": "doc-brightline-benefits",
+      "title": "Brightline Foods — Silver benefits package",
+      "owner_id": "person-events",
+      "source_id": "src-brightline-benefits-v1",
+      "body": "Brightline Foods — Silver benefits package, Innovision Campus Fest 2026\nOwner: Sana Ali, events lead. Brightline Foods has agreed a sponsor-wall logo and one social post under the event Silver policy. No stage mention or main-stage logo is promised.\nArtwork proof: Devika Sen will review the sponsor-wall lockup. Social copy remains to be agreed. This document covers Brightline only.",
+      "entries": [
+        {
+          "entry_id": "entry-brightline-package",
+          "sponsor_id": "sponsor-brightline",
+          "deliverable_id": null,
+          "text": "Owner: Sana Ali, events lead. Brightline Foods has agreed a sponsor-wall logo and one social post under the event Silver policy. No stage mention or main-stage logo is promised."
+        },
+        {
+          "entry_id": "entry-brightline-artwork",
+          "sponsor_id": "sponsor-brightline",
+          "deliverable_id": null,
+          "text": "Artwork proof: Devika Sen will review the sponsor-wall lockup. Social copy remains to be agreed. This document covers Brightline only."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3621 @@
+{
+  "schema_version": "metavision-fixtures/1",
+  "dataset_id": "dataset-innovision-2026-v1",
+  "baselines": [
+    {
+      "baseline_id": "baseline-innovision-v1",
+      "event_id": "event-innovision-2026",
+      "record_files": [
+        "sponsors.json",
+        "policies.json",
+        "deliverables.json",
+        "decisions.json",
+        "dependencies.json",
+        "documents.json",
+        "calendar.json"
+      ],
+      "source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "S1-approved",
+      "title": "Authorized Aster reduction with all three scopes explicitly approved",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications",
+            "sponsor_send"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": false,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-tracker-failure",
+      "title": "Isolated fail-once sponsor write before mutation",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [
+        {
+          "fault_id": "fault-tracker-before-write",
+          "kind": "transient_before_write",
+          "target_tool": "update_sponsor",
+          "target_id": "sponsor-aster",
+          "attempt": 1,
+          "timing": "before_write",
+          "actor_id": null,
+          "effect": null
+        }
+      ],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": false,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-concurrent-edit",
+      "title": "Isolated external D3 publication requires current delta approval",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        },
+        {
+          "stage": "delta",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [
+        {
+          "fault_id": "fault-d3-external-publish",
+          "kind": "concurrent_publish",
+          "target_tool": "update_deliverable",
+          "target_id": "D3",
+          "attempt": null,
+          "timing": "after_approval_before_cancel",
+          "actor_id": "person-social",
+          "effect": {
+            "status": "done",
+            "version_increment": 1
+          }
+        }
+      ],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": false,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-main-demo",
+      "title": "Main demo combines tracker retry and mid-stream D3 replan",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        },
+        {
+          "stage": "delta",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [
+        {
+          "fault_id": "fault-tracker-before-write",
+          "kind": "transient_before_write",
+          "target_tool": "update_sponsor",
+          "target_id": "sponsor-aster",
+          "attempt": 1,
+          "timing": "before_write",
+          "actor_id": null,
+          "effect": null
+        },
+        {
+          "fault_id": "fault-d3-external-publish",
+          "kind": "concurrent_publish",
+          "target_tool": "update_deliverable",
+          "target_id": "D3",
+          "attempt": null,
+          "timing": "after_approval_before_cancel",
+          "actor_id": "person-social",
+          "effect": {
+            "status": "done",
+            "version_increment": 1
+          }
+        }
+      ],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": false,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-initial-rejection",
+      "title": "Organizer rejects initial package before any business mutation",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "reject",
+          "approver_id": "person-organizer",
+          "approved_scopes": [],
+          "review_at": null
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-replay",
+      "title": "Ten additional identical deliveries reuse the approved logical effects",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 10,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": false,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-timeout-after-write",
+      "title": "Unknown sponsor-write outcome must be reconciled before retry",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [
+        {
+          "fault_id": "fault-tracker-ambiguous-timeout",
+          "kind": "timeout_after_write",
+          "target_tool": "update_sponsor",
+          "target_id": "sponsor-aster",
+          "attempt": 1,
+          "timing": "after_possible_write",
+          "actor_id": null,
+          "effect": null
+        }
+      ],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": false,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-unknown-sender",
+      "title": "Unmapped sender cannot authorize a commitment change",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-unknown",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-unknown"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-unknown",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-unknown"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-tentative",
+      "title": "Tentative discussion is not a confirmed reduction",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-tentative",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-tentative"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-tentative",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-tentative"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-injection",
+      "title": "Legitimate authorized amount survives embedded untrusted instructions",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-injection",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-injection"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-injection",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-injection"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-currency-unresolved",
+      "title": "Explicitly different unnamed currency is not inferred as INR",
+      "priority": "P1",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-currency-unresolved",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-currency-unresolved"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-currency-unresolved",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-currency-unresolved"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-authorized-conflict",
+      "title": "Two mapped Aster contacts disagree without supersession",
+      "priority": "P1",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002",
+        "chat-whatsapp-aster-conflict"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "chat-whatsapp-aster-conflict",
+          "order": 15,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002",
+          "chat-whatsapp-aster-conflict"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-conflict-clarified",
+      "title": "Explicit follow-up replaces both authorized conflicting claims then seeks approval",
+      "priority": "P1",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002",
+        "chat-whatsapp-aster-conflict",
+        "mail-aster-clarification"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "chat-whatsapp-aster-conflict",
+          "order": 15,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "mail-aster-clarification",
+          "order": 16,
+          "phase": "clarification"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "after_clarification",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002",
+          "chat-whatsapp-aster-conflict",
+          "mail-aster-clarification"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-unauthorized-whatsapp",
+      "title": "Unauthorized WhatsApp concern cannot override mapped Priya commitment",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002",
+        "chat-whatsapp-aster-unauthorized"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "chat-whatsapp-aster-unauthorized",
+          "order": 15,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002",
+          "chat-whatsapp-aster-unauthorized"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-tracker-chat-mismatch",
+      "title": "Current finance chat differs from tracker and lacks adjudication",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002",
+        "chat-slack-tracker-mismatch"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "chat-slack-tracker-mismatch",
+          "order": 15,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002",
+          "chat-slack-tracker-mismatch"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-stale-chat",
+      "title": "Historical Gold amount is not a current contradictory instruction",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002",
+        "chat-slack-aster-stale"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "chat-slack-aster-stale",
+          "order": 15,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002",
+          "chat-slack-aster-stale"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-rejected-delta",
+      "title": "Reject v2 at the D3 cancellation barrier and preserve partial execution",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        },
+        {
+          "stage": "delta",
+          "decision": "reject",
+          "approver_id": "person-organizer",
+          "approved_scopes": [],
+          "review_at": null
+        }
+      ],
+      "faults": [
+        {
+          "fault_id": "fault-d3-external-publish",
+          "kind": "concurrent_publish",
+          "target_tool": "update_deliverable",
+          "target_id": "D3",
+          "attempt": null,
+          "timing": "after_approval_before_cancel",
+          "actor_id": "person-social",
+          "effect": {
+            "status": "done",
+            "version_increment": 1
+          }
+        }
+      ],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-calendar-outage",
+      "title": "Permanent calendar failure preserves approved work and seeks fallback approval",
+      "priority": "P1",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        },
+        {
+          "stage": "fallback",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records"
+          ],
+          "review_at": null
+        }
+      ],
+      "faults": [
+        {
+          "fault_id": "fault-calendar-permanent",
+          "kind": "permanent_outage",
+          "target_tool": "upsert_calendar_item",
+          "target_id": "cal-sponsor-review",
+          "attempt": null,
+          "timing": "all_attempts",
+          "actor_id": null,
+          "effect": null
+        }
+      ],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-short-term-approval-resume",
+      "title": "Restart at initial approval resumes the same stored plan and questions",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": false,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "short_term_resume",
+        "pause_at": "initial_approval",
+        "resume_same_run": true,
+        "preserve_committed_effects": true
+      }
+    },
+    {
+      "scenario_id": "S1-short-term-partial-resume",
+      "title": "Restart after sponsor commit reconciles the ledger without repeating effects",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": false,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "short_term_resume",
+        "pause_at": "after_sponsor_commit",
+        "resume_same_run": true,
+        "preserve_committed_effects": true
+      }
+    },
+    {
+      "scenario_id": "S1-gmail-unavailable",
+      "title": "Permanent trigger-mail read outage blocks affected actions without chat substitution",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [],
+      "faults": [
+        {
+          "fault_id": "fault-gmail-read-permanent",
+          "kind": "permanent_outage",
+          "target_tool": "read_source",
+          "target_id": "mail-aster-002",
+          "attempt": null,
+          "timing": "all_attempts",
+          "actor_id": null,
+          "effect": null
+        }
+      ],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-privacy-agent-failure",
+      "title": "Privacy-boundary check within Communication/Knowledge fails before context release",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002",
+        "mail-aster-private",
+        "chat-whatsapp-private"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "mail-aster-private",
+          "order": 15,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "chat-whatsapp-private",
+          "order": 16,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [],
+      "faults": [
+        {
+          "fault_id": "fault-privacy-boundary-agent",
+          "kind": "agent_failure",
+          "target_tool": null,
+          "target_id": "privacy_boundary",
+          "attempt": 1,
+          "timing": "before_sensitive_context_release",
+          "actor_id": null,
+          "effect": null
+        }
+      ],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [
+          "mail-aster-private",
+          "chat-whatsapp-private"
+        ],
+        "outgoing_excluded_source_ids": [
+          "mail-aster-private",
+          "chat-whatsapp-private"
+        ]
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S1-privacy-scope",
+      "title": "Confidential evidence stays outside all agent/model contexts and outgoing outputs",
+      "priority": "P0",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T06:30:00+05:30",
+      "trigger_source_id": "mail-aster-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002",
+        "mail-aster-private",
+        "chat-whatsapp-private"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "mail-aster-private",
+          "order": 15,
+          "phase": "trigger"
+        },
+        {
+          "source_id": "chat-whatsapp-private",
+          "order": 16,
+          "phase": "trigger"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": "2026-11-15T12:00:00+05:30"
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": null,
+      "intentional_negative": true,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002"
+        ],
+        "denied_source_ids": [
+          "mail-aster-private",
+          "chat-whatsapp-private"
+        ],
+        "outgoing_excluded_source_ids": [
+          "mail-aster-private",
+          "chat-whatsapp-private"
+        ]
+      },
+      "memory": {
+        "mode": "fresh",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": false
+      }
+    },
+    {
+      "scenario_id": "S2-brightline-inherited",
+      "title": "Brightline increases only after a future verified actual main-demo parent",
+      "priority": "P1",
+      "event_id": "event-innovision-2026",
+      "baseline_id": "baseline-innovision-v1",
+      "demo_now": "2026-11-14T09:30:00+05:30",
+      "trigger_source_id": "mail-brightline-002",
+      "available_source_ids": [
+        "mail-aster-001",
+        "chat-014",
+        "chat-015",
+        "mail-brightline-001",
+        "mail-corvex-001",
+        "src-contact-register",
+        "src-tracker-sponsors",
+        "src-budget-v1",
+        "src-policy-tiers-v1",
+        "src-benefits-aster-v1",
+        "src-run-sheet-v1",
+        "src-brightline-benefits-v1",
+        "src-calendar-existing-v1",
+        "mail-aster-002",
+        "mail-brightline-002"
+      ],
+      "activation": [
+        {
+          "source_id": "mail-aster-001",
+          "order": 1,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-014",
+          "order": 2,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "chat-015",
+          "order": 3,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-brightline-001",
+          "order": 4,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-corvex-001",
+          "order": 5,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-contact-register",
+          "order": 6,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-tracker-sponsors",
+          "order": 7,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-budget-v1",
+          "order": 8,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-policy-tiers-v1",
+          "order": 9,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-benefits-aster-v1",
+          "order": 10,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-run-sheet-v1",
+          "order": 11,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-brightline-benefits-v1",
+          "order": 12,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "src-calendar-existing-v1",
+          "order": 13,
+          "phase": "baseline"
+        },
+        {
+          "source_id": "mail-aster-002",
+          "order": 14,
+          "phase": "after_verified_parent"
+        },
+        {
+          "source_id": "mail-brightline-002",
+          "order": 15,
+          "phase": "after_verified_parent"
+        }
+      ],
+      "human_choices": [
+        {
+          "stage": "initial",
+          "decision": "approve",
+          "approver_id": "person-organizer",
+          "approved_scopes": [
+            "business_records",
+            "internal_notifications"
+          ],
+          "review_at": null
+        }
+      ],
+      "faults": [],
+      "replay": {
+        "additional_deliveries": 0,
+        "same_source_identity": true,
+        "same_content": true
+      },
+      "inheritance": {
+        "parent_scenario_id": "S1-main-demo",
+        "required_parent_state": "verified_actual",
+        "state_source": "runtime_state_and_history",
+        "include_history": true
+      },
+      "intentional_negative": false,
+      "privacy": {
+        "allowed_source_ids": [
+          "mail-aster-001",
+          "chat-014",
+          "chat-015",
+          "mail-brightline-001",
+          "mail-corvex-001",
+          "src-contact-register",
+          "src-tracker-sponsors",
+          "src-budget-v1",
+          "src-policy-tiers-v1",
+          "src-benefits-aster-v1",
+          "src-run-sheet-v1",
+          "src-brightline-benefits-v1",
+          "src-calendar-existing-v1",
+          "mail-aster-002",
+          "mail-brightline-002"
+        ],
+        "denied_source_ids": [],
+        "outgoing_excluded_source_ids": []
+      },
+      "memory": {
+        "mode": "long_term_inherit",
+        "pause_at": null,
+        "resume_same_run": false,
+        "preserve_committed_effects": true
+      }
+    }
+  ]
+}

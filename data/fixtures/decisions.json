@@ -1,0 +1,56 @@
+{
+  "schema_version": "metavision-fixtures/1",
+  "dataset_id": "dataset-innovision-2026-v1",
+  "decisions": [
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T22:10:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T23:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-aster-package-approval",
+        "evidence-tracker-dec05"
+      ],
+      "decision_id": "DEC-05",
+      "title": "Approve Aster's final Gold promotional package",
+      "status": "pending",
+      "owner_id": "person-organizer",
+      "sponsor_id": "sponsor-aster",
+      "condition": null,
+      "optional_cost_paise": null,
+      "currency": "INR",
+      "condition_evaluation": null
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T20:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-budget-upgrade-condition"
+      ],
+      "decision_id": "DEC-07",
+      "title": "Approve optional DJ and sound upgrade",
+      "status": "pending",
+      "owner_id": "person-finance",
+      "sponsor_id": null,
+      "condition": {
+        "metric": "forecast_balance_paise",
+        "budget_id": "budget-innovision-2026",
+        "operator": "gte",
+        "threshold_paise": 2500000,
+        "currency": "INR",
+        "evidence_ids": [
+          "evidence-budget-upgrade-condition"
+        ]
+      },
+      "optional_cost_paise": 2500000,
+      "currency": "INR",
+      "condition_evaluation": null
+    }
+  ]
+}

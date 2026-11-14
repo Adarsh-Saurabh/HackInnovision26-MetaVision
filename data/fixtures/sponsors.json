@@ -1,0 +1,392 @@
+{
+  "schema_version": "metavision-fixtures/1",
+  "dataset_id": "dataset-innovision-2026-v1",
+  "events": [
+    {
+      "event_id": "event-innovision-2026",
+      "name": "Innovision Campus Fest 2026",
+      "starts_on": "2026-11-21",
+      "ends_on": "2026-11-22",
+      "timezone": "Asia/Kolkata"
+    }
+  ],
+  "budgets": [
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T20:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-budget-owner-sponsors",
+        "evidence-budget-expenses"
+      ],
+      "budget_id": "budget-innovision-2026",
+      "currency": "INR",
+      "sponsor_ids": [
+        "sponsor-aster",
+        "sponsor-brightline",
+        "sponsor-corvex"
+      ],
+      "expense_ids": [
+        "expense-venue",
+        "expense-stage",
+        "expense-refreshments",
+        "expense-printing",
+        "expense-volunteers"
+      ]
+    }
+  ],
+  "expenses": [
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T20:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-budget-expenses"
+      ],
+      "expense_id": "expense-venue",
+      "budget_id": "budget-innovision-2026",
+      "description": "Venue and permits",
+      "amount_paise": 6500000,
+      "currency": "INR"
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T20:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-budget-expenses"
+      ],
+      "expense_id": "expense-stage",
+      "budget_id": "budget-innovision-2026",
+      "description": "Base stage and sound",
+      "amount_paise": 7000000,
+      "currency": "INR"
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T20:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-budget-expenses"
+      ],
+      "expense_id": "expense-refreshments",
+      "budget_id": "budget-innovision-2026",
+      "description": "Refreshments",
+      "amount_paise": 4500000,
+      "currency": "INR"
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T20:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-budget-expenses"
+      ],
+      "expense_id": "expense-printing",
+      "budget_id": "budget-innovision-2026",
+      "description": "Printing and signage",
+      "amount_paise": 2500000,
+      "currency": "INR"
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-11-13T20:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T20:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-budget-expenses"
+      ],
+      "expense_id": "expense-volunteers",
+      "budget_id": "budget-innovision-2026",
+      "description": "Volunteer logistics",
+      "amount_paise": 1500000,
+      "currency": "INR"
+    }
+  ],
+  "people": [
+    {
+      "person_id": "person-priya",
+      "event_id": "event-innovision-2026",
+      "name": "Priya Nair",
+      "role": "sponsor_contact",
+      "email": "priya.nair@aster.example",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "person_id": "person-aster-secondary",
+      "event_id": "event-innovision-2026",
+      "name": "Neil Shah",
+      "role": "sponsor_contact",
+      "email": null,
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "person_id": "person-brightline-contact",
+      "event_id": "event-innovision-2026",
+      "name": "Devika Sen",
+      "role": "sponsor_contact",
+      "email": "devika.sen@brightline.example",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "person_id": "person-corvex-contact",
+      "event_id": "event-innovision-2026",
+      "name": "Arjun Rao",
+      "role": "sponsor_contact",
+      "email": "arjun.rao@corvex.example",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "person_id": "person-design",
+      "event_id": "event-innovision-2026",
+      "name": "Meera Kapoor",
+      "role": "design",
+      "email": "meera@innovision.example",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "person_id": "person-social",
+      "event_id": "event-innovision-2026",
+      "name": "Rohan Das",
+      "role": "social",
+      "email": "rohan@innovision.example",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "person_id": "person-events",
+      "event_id": "event-innovision-2026",
+      "name": "Sana Ali",
+      "role": "events",
+      "email": "sana@innovision.example",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "person_id": "person-finance",
+      "event_id": "event-innovision-2026",
+      "name": "Ishan Bose",
+      "role": "finance",
+      "email": "ishan@innovision.example",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "person_id": "person-organizer",
+      "event_id": "event-innovision-2026",
+      "name": "Kavya Iyer",
+      "role": "organizer",
+      "email": "kavya@innovision.example",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "person_id": "person-unknown",
+      "event_id": "event-innovision-2026",
+      "name": "Unregistered sender",
+      "role": "unknown",
+      "email": null,
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    }
+  ],
+  "contacts": [
+    {
+      "contact_id": "contact-aster-priya",
+      "event_id": "event-innovision-2026",
+      "person_id": "person-priya",
+      "sponsor_id": "sponsor-aster",
+      "address": "priya.nair@aster.example",
+      "authority": "commitment_contact",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "contact_id": "contact-aster-neil",
+      "event_id": "event-innovision-2026",
+      "person_id": "person-aster-secondary",
+      "sponsor_id": "sponsor-aster",
+      "address": "@aster-neil-demo",
+      "authority": "commitment_contact",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "contact_id": "contact-brightline-devika",
+      "event_id": "event-innovision-2026",
+      "person_id": "person-brightline-contact",
+      "sponsor_id": "sponsor-brightline",
+      "address": "devika.sen@brightline.example",
+      "authority": "commitment_contact",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "contact_id": "contact-corvex-arjun",
+      "event_id": "event-innovision-2026",
+      "person_id": "person-corvex-contact",
+      "sponsor_id": "sponsor-corvex",
+      "address": "arjun.rao@corvex.example",
+      "authority": "commitment_contact",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    }
+  ],
+  "aliases": [
+    {
+      "alias_id": "alias-aster-name",
+      "event_id": "event-innovision-2026",
+      "entity_id": "sponsor-aster",
+      "alias": "Aster Labs",
+      "source_id": "mail-aster-001",
+      "evidence_ids": [
+        "evidence-mail-aster-001-body"
+      ]
+    },
+    {
+      "alias_id": "alias-aster-short",
+      "event_id": "event-innovision-2026",
+      "entity_id": "sponsor-aster",
+      "alias": "Aster",
+      "source_id": "mail-aster-001",
+      "evidence_ids": [
+        "evidence-mail-aster-001-body"
+      ]
+    },
+    {
+      "alias_id": "alias-priya-short",
+      "event_id": "event-innovision-2026",
+      "entity_id": "person-priya",
+      "alias": "Priya N.",
+      "source_id": "src-contact-register",
+      "evidence_ids": [
+        "evidence-contact-register-body"
+      ]
+    },
+    {
+      "alias_id": "alias-brightline-name",
+      "event_id": "event-innovision-2026",
+      "entity_id": "sponsor-brightline",
+      "alias": "Brightline Foods",
+      "source_id": "mail-brightline-001",
+      "evidence_ids": [
+        "evidence-mail-brightline-001-body"
+      ]
+    },
+    {
+      "alias_id": "alias-corvex-name",
+      "event_id": "event-innovision-2026",
+      "entity_id": "sponsor-corvex",
+      "alias": "Corvex Systems",
+      "source_id": "mail-corvex-001",
+      "evidence_ids": [
+        "evidence-mail-corvex-001-body"
+      ]
+    }
+  ],
+  "sponsors": [
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-10-20T11:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T23:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-mail-aster-001-body",
+        "evidence-tracker-aster"
+      ],
+      "sponsor_id": "sponsor-aster",
+      "name": "Aster Labs",
+      "commitment_id": "commitment-aster",
+      "commitment_paise": 10000000,
+      "cash_received_paise": 0,
+      "currency": "INR",
+      "tier": "Gold",
+      "contact_ids": [
+        "contact-aster-priya",
+        "contact-aster-neil"
+      ]
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-10-22T14:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T23:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-mail-brightline-001-body",
+        "evidence-tracker-brightline"
+      ],
+      "sponsor_id": "sponsor-brightline",
+      "name": "Brightline Foods",
+      "commitment_id": "commitment-brightline",
+      "commitment_paise": 9000000,
+      "cash_received_paise": 0,
+      "currency": "INR",
+      "tier": "Silver",
+      "contact_ids": [
+        "contact-brightline-devika"
+      ]
+    },
+    {
+      "event_id": "event-innovision-2026",
+      "version": 1,
+      "valid_from": "2026-10-23T09:00:00+05:30",
+      "valid_to": null,
+      "recorded_at": "2026-11-13T23:01:00+05:30",
+      "superseded_by": null,
+      "evidence_ids": [
+        "evidence-mail-corvex-001-body",
+        "evidence-tracker-corvex"
+      ],
+      "sponsor_id": "sponsor-corvex",
+      "name": "Corvex Systems",
+      "commitment_id": "commitment-corvex",
+      "commitment_paise": 6000000,
+      "cash_received_paise": 0,
+      "currency": "INR",
+      "tier": "Silver",
+      "contact_ids": [
+        "contact-corvex-arjun"
+      ]
+    }
+  ]
+}
