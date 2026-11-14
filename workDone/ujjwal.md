@@ -4,36 +4,84 @@ Read **Resume here** first. This is Ujjwal's file; teammates' files are in the s
 
 ## Resume here
 
-_Updated: 2026-11-14 05:58 IST by Ujjwal session 4. Commit after `a13e7c8` on `main` (this update, `API.md`, `.env.example` pushed together); uncommitted: `.claude/settings.json` only (machine-specific path). Local `.env` holds the Gemini key and is git-ignored._
+_Updated: 2026-11-14 07:18 IST by Ujjwal session 5. Commit `84a50c4` on `codex/demo-core` (same as `main`, both pushed); uncommitted: this file only._
 
-**Working on:** blueprint rev 2.1 robustness design (§8.1, §9.2, §10.1-§10.4, §12.2-§12.4, §13.3, §14.5) now aligned with Adarsh's frozen fixtures in `data/fixtures/`. Gemini key tested; setup in `API.md`.
+**Working on:** demo prototype complete (engine + Streamlit UI + optional Gemini); dataset scenario coverage 20/24. Moving to submission material (§19.2 08:30 slot).
 
-**Next action:** Agree the P0 split (§20), then `uv init` + `uv add` per §21 and write `second_brain/storage.py` that seeds SQLite from `data/fixtures/` (§19.1 step 2), starting with `S1-main-demo`. No more planning-doc work before code.
+**Next action:** Record the demo video from `uv run python -m streamlit run app.py` (click order in `docs/demo-plan-and-viva-guide.md` §2 / UI: Deliver → Run agents → Approve → Execute → Approve 6 → Execute → Verify → Replay ×10), then update `README.md` with run commands and the measured results below (§19.2, §25).
 
 **Team P0 progress (§3.1, 11 items)**, as known at this update
 | # | Item | Status | Owner | Where / notes |
 |---|---|---|---|---|
-| 1 | Seed workspace from fixtures (simulated clock `DEMO_NOW`) | in progress (fixtures done + validated, loader not started) | Adarsh (fixtures) | `data/fixtures/`, `python -B data/fixtures/validate.py` PASS |
-| 2 | Communication: entity extraction with spans | not started | | |
-| 3 | Knowledge: resolve sponsor, context bundle, traversal incl. DEC-07 | not started | | |
-| 4 | Planning: `EVT-*` rules, mid-stream classification, versioned plan | not started | | §11.2, §11.5 |
-| 5 | Verification preflight before approval | not started | | §11.5 |
-| 6 | Approval gate (LangGraph interrupt), three scopes | not started | | §13.2 |
-| 7 | Execution with operation keys + fail-once tracker retry | not started | | |
-| 8 | Adaptive replan on concurrent D3 edit, delta re-approval | not started | | §11.3 |
-| 9 | Verification read-back, summary, ledger, agent timeline | not started | | §15 |
-| 10 | Replay source message: zero duplicate effects | not started | | |
-| 11 | Paused approval survives process restart | not started | | |
+| 1 | Seed workspace from fixtures (simulated clock) | verified | Ujjwal (loader), Adarsh (fixtures) | `second_brain/storage.py`; `demo_now` from scenario |
+| 2 | Communication: extraction with spans, denied sources excluded | verified | Ujjwal | `agents.communication_agent`, `llm.cross_check`; privacy scenarios pass |
+| 3 | Knowledge: sponsor/authority resolution, traversal incl. DEC-07 | verified | Ujjwal | `agents.knowledge_agent`; no Brightline/Corvex leakage tested |
+| 4 | Planning: classification, versioned plan, deficit, at-risk | verified | Ujjwal | `agents.planning_agent`; plan v1/v2; `EVT-*` IDs not emitted explicitly |
+| 5 | Verification preflight before approval | not done (cut) | | Coordinator pre-planning gates exist instead; DEVIATION |
+| 6 | Approval gate, three scopes | verified | Ujjwal | `workflow.approve`; plain Python, not LangGraph interrupt (DEVIATION) |
+| 7 | Execution with op keys + fail-once tracker retry | verified | Ujjwal | `tools.Tools.execute`; also timeout-after-write reconcile |
+| 8 | Adaptive replan on concurrent D3 edit, delta re-approval | verified | Ujjwal | `workflow._handle_conflict`, `approve_delta` |
+| 9 | Read-back verification, summary, ledger, agent timeline | verified | Ujjwal | `agents.verification_agent`, `app.py` timeline/ledger tabs |
+| 10 | Replay: zero duplicate effects | verified | Ujjwal | `workflow.replay`; S1-replay 10 deliveries → 0 effects |
+| 11 | Paused approval survives process restart | not done (cut) | | No checkpointer; 2 resume scenarios NOT TESTED |
 
-**Schedule (§19.2):** 05:58 IST, end of the 04:30-06:00 slot (LangGraph agents, checkpoint, approval, retry). Only fixtures exist; no app code or `pyproject.toml`. Behind ~3 slots. Apply §19.2 cuts now: alias-only inferred edges, no live LLM until UI works, replan at pre-execution revalidation instead of mid-execution, edge table instead of graph rendering.
+**Schedule (§19.2):** 07:18 IST, inside 06:00-07:30 (replan, UI, timeline, live extraction): all done, slightly ahead. Next: 07:30-08:30 rehearsal + only high-impact fixes; 08:30 feature freeze, README, video.
 
-**Run / test commands that work now:** `python -B data/fixtures/validate.py` (PASS), `python -B data/fixtures/validate.py --self-test`. Gemini key check: see `API.md` §3. No app/tests yet.
+**Run / test commands that work now:**
+- `uv sync` then `uv run python -m streamlit run app.py` (Windows blocks `streamlit.exe`/`pytest.exe`; always use `python -m`)
+- `uv run --locked python -m pytest -q` → 67 passed
+- `uv run python scripts/run_scenarios.py` → 20 PASS / 1 FAIL / 3 NOT TESTED
+- Live Gemini: sidebar toggle, or `LLM_MODE=live` in `.env`
 
-**Blockers, open decisions, and needs from teammates:** P0 owner split (§20); submission portal and real cutoff (09:30 vs noon, §1). Gemini key resolved: share privately (not Git), each person copies `.env.example` to `.env`. The fixtures mark 19 scenarios P0: test priorities, not demo requirements; build `S1-main-demo` first (§26). Skill template still says "all 10 P0 items"; §3.1 has 11.
+**Blockers, open decisions, and needs from teammates:** real submission cutoff (09:30 vs noon, §1) still unconfirmed. Adarsh: slides + README from `docs/demo-plan-and-viva-guide.md`. Vaibhav: video script/recording. Decide whether to spend 07:30-08:30 on UI polish (before/after panel, auto-play) or leave as is.
 
-**Known broken / do not trust:** nothing implemented; blueprint numbers are targets. Fixture validator passing proves static consistency only, not any workflow. `uplan-ai` facts in §1.1 unverified. Gemini key is now in this session's chat transcript; rotate it if that transcript is shared.
+**Known broken / do not trust:** S2-brightline-inherited FAILS (no long-term inheritance). Calendar outage/fallback and restart/resume not implemented (NOT TESTED). Clarification gates are fixture-tuned rules (keywords, amounts, 24 h window). Planner/draft texts hard-code Aster/S1 details (review slot, signer Kavya). Gemini key was in an earlier session transcript; rotate if shared.
 
 ## Session log
+
+### Session 5: 2026-11-14 ~06:15-07:18 IST, working demo engine, Streamlit UI, Gemini toggle, 24-scenario dataset run
+
+- **Branch:** `codex/demo-core` (merged to `main` 3 times, last merge `84a50c4`)
+- **Start → end commit:** `52952ea` → `84a50c4` (uncommitted changes: no, except this file)
+- **Goal:** build the demo-first prototype for judges and video (§3.1 P0 path for `S1-main-demo`, §19.1), verified by independent agents; then run every dataset scenario against `expected_outcomes.json`.
+
+**Done**
+- `docs/demo-plan-and-viva-guide.md` (`cf84fd9`, on `main`): demo story, six agents, viva concepts, slide outline, likely viva questions. For Adarsh/Vaibhav slides and viva prep.
+- `pyproject.toml`, `uv.lock`, `.python-version` (3.12): deps `streamlit pydantic google-genai python-dotenv`, dev `pytest`; pytest `pythonpath=["."]`.
+- `second_brain/storage.py`: `Store.from_fixtures(scenario_id)` seeds SQLite (`records`, append-only `history`, `ops` ledger, `deliveries`, `log`); `put()` with optimistic version check → `VersionConflict`; `deliver()` dedupes by source+content hash and enforces scenario allowlist minus `privacy.denied_source_ids`; `baseline()`, `effect_count()`, `close()`.
+- `second_brain/tools.py`: `Tools.execute(action)` = idempotent by `op_key` (committed → reused), scripted faults: `transient_before_write` (fail-once), `concurrent_publish` (person-social sets D3 done, v1→v2), `timeout_after_write` (`ToolTimeout`) + `reconcile()` read-back.
+- `second_brain/agents.py` (written by a builder subagent, then edited): `communication_agent`, `knowledge_agent` (sponsor-scoped traversal, reverse `CONTINGENT_ON` → DEC-07, inferred chat-014 MENTIONS D1 via PH-2231), `planning_agent` (dispositions D1 flag_human / D2 satisfied / D3 cancel or over_delivery / D4 cancel; actions with deterministic `op_key` = sha256 of scenario+source+tool+target+changes), `verification_agent` (read-back + gated invariants), `compute_financials`, `tier_for`.
+- `second_brain/workflow.py`: Coordinator/Execution state machine `ingest → analyze → approve(scopes) → execute → [VersionConflict → plan v2, delta classified reuse/covered/needs_approval] → approve_delta → execute → verify → replay`; bounded retry; read-back of business records before internal posts; gates: unreadable source / privacy-boundary failure → `blocked` (fail closed); tentative wording, unnamed currency, competing authorised or team claims within 24 h → `needs_clarification`; `clarify(source_id)` reruns analysis; `run_scripted()`.
+- `second_brain/llm.py`: optional live Gemini (`MODEL_NAME`, default `gemini-3.5-flash-lite`) structured extraction; accepted only if grounded in message text (exact number tokens incl. 6,00,000) and agreeing with rules on sponsor/amounts/deadline; max 2 calls, 20 s timeout, error → rules; skipped for unverified senders.
+- `app.py` Streamlit UI: step bar, KPI metrics, full-width colour-coded graphviz impact graph, per-stage action box (approval with 3 scope checkboxes, plan v2 delta table), animated agent timeline, tabs (paths, plan, workspace apps, inbox, verification, ledger), sidebar (reset, faults, animation, live Gemini toggle).
+- `scripts/run_scenarios.py`: runs all 24 dataset scenarios per their activation/choices/faults/replay and checks the oracle profile. Result **20 PASS, 1 FAIL (S2 inheritance), 3 NOT TESTED** (calendar outage + fallback, 2 restart/resume).
+- Tests: `tests/test_main_demo.py`, `test_robustness.py`, `test_app.py` (Streamlit AppTest), `test_llm.py`, `test_scenarios.py` (20 parametrised scenarios), `conftest.py` (forces fixture mode, blocks real Gemini).
+
+**How**
+- Multi-agent build: 1 builder subagent (agents.py), 1 adversarial tester, 1 UI tester, 3 reviewer passes; every finding reproduced, fixed, and covered by a test.
+- Plan v2 reuse comes from content-addressed `op_key`s: unchanged action → same key → ledger says committed → reused; changed text → new key → needs approval. Unchanged-but-unexecuted actions are "covered" by the v1 approval.
+- Sending to sponsor is a separate `send_email` action (kind `outbox`, scope `sponsor_send`) whose key includes the body.
+
+**Decisions and blueprint deviations**
+- DEVIATION from §6/§21 (LangGraph): plain-Python state machine; approval pause held in Streamlit session state. Reason: time; same logic visible on video.
+- DEVIATION from §3.1 item 11: no checkpoint/restart durability (workflow state in memory). 2 resume scenarios reported NOT TESTED.
+- DEVIATION from §3.1 item 5: no separate Verification preflight before approval; Coordinator pre-planning gates and read-back verification only.
+- DEVIATION from §19.2 cut list: live LLM and graph rendering were kept (both working).
+- Planner order: D3 cancel before D4, because oracle `profile-s1-rejected-delta` expects D4 still planned after a rejected v2.
+- Clarification gates are keyword/amount/24-hour-window rules tuned on these fixtures; not general NLP.
+
+**Problems / dead ends**
+- Windows Application Control blocks `pytest.exe` and `streamlit.exe` ("An Application Control policy has blocked this file. (os error 4551)"); use `uv run python -m pytest` / `python -m streamlit`.
+- Reviewer findings fixed: replay could create effects for never-executed actions; verify could pass with approved-but-blocked actions; invariants failed on honest partial approvals; delta approve button ignored v1 scopes (sent unticked posts); `Store.deliver` ignored the scenario allowlist; Gemini grounding substring holes.
+- First live Gemini call returned `ServerError`; fallback worked; added one bounded retry. Next live run: agree, 21/21 checks.
+- Commit `a660775` was pushed with a failing test (pipe to `tail` masked the exit code); fixed in `fc6416f`; later commands check `rc` before committing.
+- Initial dataset run 13/24; fixed tentative, currency crash, authorised conflict, tracker-chat mismatch, gmail-unavailable, privacy-agent-failure, timeout-after-write, sponsor send, rejected-delta order.
+
+**Verification**
+- `uv run --locked python -m pytest -q` → **67 passed** (at `84a50c4`).
+- `uv run python scripts/run_scenarios.py` → 20/24 PASS, 1 FAIL, 3 NOT TESTED.
+- Live: `Workflow(use_llm=True).run_scripted()` → Gemini agree, verified 21/0.
+- Manual: clicked Deliver → Run agents → Approve → Execute → plan v2 screen in Chrome at `localhost:8501`; AppTest drives the full path including Verify and Replay (0 new effects).
 
 ### Session 4: 2026-11-14 ~04:10-05:58 IST, robustness design (rev 2.1), fixtures merge, Gemini key
 
