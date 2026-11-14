@@ -10,6 +10,7 @@ import html
 import json
 import re
 import time
+from pathlib import Path
 
 import streamlit as st
 
@@ -131,11 +132,16 @@ def bullet_list(items: list[str]) -> str:
 
 
 # ---------------------------------------------------------------- state
-def new_workflow() -> None:
+MEMORY_PATH = str(Path(__file__).resolve().parent / "runtime" / "memory.sqlite")   # long-term memory, survives restarts
+RUN2 = "S2-brightline-inherited"
+
+
+def new_workflow(scenario: str = "S1-main-demo") -> None:
     old = st.session_state.get("wf")
     if old is not None:
         old.close()
-    st.session_state.wf = Workflow("S1-main-demo", inject_faults=st.session_state.get("faults", True))
+    st.session_state.wf = Workflow(scenario, inject_faults=st.session_state.get("faults", True),
+                                   memory_path=MEMORY_PATH)
     st.session_state.seen = 0
 
 
@@ -354,7 +360,16 @@ with left:
     with box:
         if stage in OBJECTIVE:
             label(OBJECTIVE[stage])
-        if stage == "ready":
+        sender = (store.get("person", store._sources[wf.trigger_id]["sender_id"]) or {}).get("name", "the sponsor")
+        if stage == "ready" and store.inherited_from:
+            st.subheader("Run 2. A second sponsor email, with memory of run 1")
+            note("<b>Long-term memory:</b> this run does not start from the original data. It starts from the "
+                 "verified result of run 1, loaded from a file that survives restarts: Aster is already at "
+                 "INR 60,000 Silver, and run 1's open questions are still open.")
+            st.write(f"Now {sender} from Brightline Foods is about to raise their sponsorship.")
+            if st.button(f"Deliver {sender.split()[0]}'s email", type="primary", width="stretch"):
+                run_step(wf.ingest)
+        elif stage == "ready":
             st.subheader("Step 1. An email is about to arrive")
             st.write("Aster Labs is one of the fest's main sponsors. Their contact, Priya, is about to email "
                      "the organisers. Right now every app (tracker, budget, docs, chat, calendar) shows the "
@@ -364,7 +379,8 @@ with left:
         elif stage == "ingested":
             src = store.source(wf.trigger_id)
             st.subheader("Step 2. The email has arrived")
-            st.markdown(f'<div class="msg trigger"><span class="meta">From Priya Nair, Aster Labs · Gmail · '
+            st.markdown(f'<div class="msg trigger"><span class="meta">From {html.escape(sender)} · '
+                        f'{src["provider"].title()} · '
                         f'{src["occurred_at"][:16].replace("T", " ")}</span>{html.escape(src["body"])}</div>',
                         unsafe_allow_html=True)
             st.write("Next, the AI helpers read it, work out what it means, and find every record it affects.")
@@ -454,6 +470,11 @@ with left:
             if wf.plan["flags"]:
                 note("<b>Left for a person on purpose (not quietly fixed by the AI):</b>"
                      + bullet_list(wf.plan["flags"]), soft=True)
+            if not store.inherited_from:
+                st.caption("This verified result is now saved in long-term memory.")
+                if st.button("Start run 2: a new sponsor email that uses this memory", width="stretch"):
+                    new_workflow(RUN2)
+                    st.rerun()
         else:
             msgs = {"rejected": "Plan rejected. No business records were changed by it.",
                     "blocked": "Stopped safely: the sender could not be confirmed, the message could not be "

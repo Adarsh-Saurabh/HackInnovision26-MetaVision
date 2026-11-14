@@ -125,3 +125,16 @@ def test_reset_midway_returns_to_ready():
 
 def test_no_deprecated_use_container_width():
     assert "use_container_width" not in Path(APP).read_text(encoding="utf-8")
+
+
+def test_run2_recalls_run1_from_long_term_memory():
+    at = full_path(start())
+    click(at, "Start run 2")
+    wf = at.session_state.wf
+    assert wf.stage == "ready" and wf.store.inherited_from == "S1-main-demo"
+    for label in ("Deliver", "Run the agents", "Approve as organiser", "Execute approved", "Verify"):
+        click(at, label)
+    assert stage(at) == "verified"
+    m = metrics(at)
+    assert m["Aster's sponsorship"][0] == "INR 60,000"      # recalled from run 1, not the baseline
+    assert m["Money left after costs"][0] == "INR 0"

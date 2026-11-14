@@ -13,7 +13,7 @@ Needs Python 3.12 and [uv](https://docs.astral.sh/uv/).
 ```bash
 uv sync --locked
 uv run python -m streamlit run app.py    # the demo UI, opens http://localhost:8501
-uv run pytest -q                         # 67 tests
+uv run pytest -q                         # 70 tests
 uv run python scripts/run_scenarios.py   # all 24 dataset scenarios vs expected outcomes
 ```
 
@@ -30,6 +30,7 @@ Optional live AI reading of the email: copy `.env.example` to `.env`, set `GEMIN
 | 5 | Approve 6 changed actions | Plan v2: work already done is reused, only the 6 new or changed steps need approval |
 | 6 | Verify the results | Every changed record read back; budget recalculated: 21 checks pass |
 | 7 | Replay the email 10 times | 0 duplicate changes |
+| Run 2 | Start run 2 | Brightline raises its sponsorship. The run starts from run 1's verified state, loaded from long-term memory, and run 1's open questions are carried forward |
 
 The right-hand timeline shows every agent step, tool call, retry, conflict and approval as it happens.
 
@@ -39,7 +40,7 @@ The right-hand timeline shows every agent step, tool call, retry, conflict and a
 |---|---|
 | Extract entities (sponsor, amount, deadline, sender) | Communication agent, step 2; every value is checked against the email text |
 | Resolve cross-application dependencies | Knowledge agent, impact map and "How it spreads" tab: sponsor → commitment → tier → deliverables, docs, budget → DJ-upgrade decision |
-| Memory | Short-term: versioned records with full history, operations ledger and action log for the run. Long-term: see Limitations |
+| Memory | Short-term: versioned records with full history, operations ledger and action log for the run. Long-term: every verified run is saved to `runtime/memory.sqlite`; run 2 recalls run 1's state, history and open questions (and refuses to run if no verified run 1 exists) |
 | Six specialised agents | Communication, Knowledge, Planning, Execution, Verification, Coordinator; each logs its own steps in the timeline |
 | Tool failure handled gracefully | Fail-once tracker error retried with the same idempotency key; a timeout after the write is reconciled without writing twice |
 | Idempotency | Every action has a key built from its exact content; replaying the email 10 times adds 0 effects |
@@ -64,7 +65,7 @@ email / chat ──► Coordinator ──► Communication ──► Knowledge �
 | Agents (Communication, Knowledge, Planning, Verification) | `second_brain/agents.py` |
 | Coordinator + Execution: state machine, approvals, retries, replanning, replay | `second_brain/workflow.py` |
 | Simulated apps, fault injection, idempotent tool calls | `second_brain/tools.py` |
-| Versioned record store, history, ledger, action log (SQLite) | `second_brain/storage.py` |
+| Versioned record store, history, ledger, action log, long-term memory (SQLite) | `second_brain/storage.py` |
 | Optional Gemini extraction, used only if grounded in the email and matching the rules | `second_brain/llm.py` |
 | UI | `app.py` |
 | Synthetic dataset: sources, sponsors, deliverables, decisions, docs, calendar, 24 scenarios, expected outcomes | `data/fixtures/` |
@@ -73,10 +74,10 @@ Design choice: the agents are deterministic Python with clear role boundaries, a
 
 ## Measured results
 
-- `pytest`: 67 passed.
-- `scripts/run_scenarios.py`: **20 of 24 scenarios pass**, 1 fails, 3 are not tested.
+- `pytest`: 70 passed.
+- `scripts/run_scenarios.py`: **21 of 24 scenarios pass**, 0 fail, 3 are not tested.
   - Passing includes: main demo, tool failure, concurrent edit, timeout after write, replay, rejection, rejected delta, unknown sender (blocked), tentative wording and unclear currency (asks for clarification), conflicting sponsor contacts, prompt injection in an email, unauthorised WhatsApp sender ignored, stale chat, tracker vs chat mismatch, Gmail unavailable and privacy-agent failure (fail closed), privacy scope (confidential sources never reach any agent).
-  - Fails: `S2-brightline-inherited` (needs long-term memory carried from run 1).
+  - Also passes: `S2-brightline-inherited`, a second sponsor change that starts from run 1's verified state in long-term memory.
   - Not tested: `S1-calendar-outage` (permanent outage and fallback approval not simulated), `S1-short-term-approval-resume` and `S1-short-term-partial-resume` (process restart not simulated).
 
 ## Assumptions
@@ -88,11 +89,11 @@ Design choice: the agents are deterministic Python with clear role boundaries, a
 
 ## Limitations
 
-- **No long-term memory across runs.** The store lives for one run, so a second scenario cannot recall the first (`S2-brightline-inherited` fails).
+- **Long-term memory is a snapshot store**, one record per verified run, not a searchable knowledge base.
 - **No restart recovery.** A run paused at approval does not survive a process restart.
 - **No separate preflight review** by the Verification agent before approval; the Coordinator's checks before planning take its place.
 - Plain Python state machine instead of LangGraph (the original plan); simpler to test within 12 hours.
-- Planning texts (team messages, sponsor reply) are tailored to the main Aster scenario.
+- Planning texts (team messages, sponsor reply) are most detailed for the main Aster scenario.
 - No real connectors; the live-adapter design is in the blueprint only.
 
 ## More detail

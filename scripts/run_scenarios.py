@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -17,6 +18,8 @@ from second_brain.agents import compute_financials  # noqa: E402
 from second_brain.workflow import Workflow  # noqa: E402
 
 FIX = ROOT / "data" / "fixtures"
+# Fresh long-term memory per script run: S2 can only recall what S1 actually verified here.
+MEMORY = str(Path(tempfile.mkdtemp(prefix="sb-memory-")) / "memory.sqlite")
 SUPPORTED_FAULTS = {("transient_before_write", None), ("concurrent_publish", None), ("timeout_after_write", None),
                     ("permanent_outage", "read_source"), ("agent_failure", None)}
 NO_CHANGE = {"baseline_preserved", "clarification_required", "fail_closed"}
@@ -27,8 +30,10 @@ def load(name: str) -> dict:
 
 
 def run(scenario: dict) -> Workflow:
-    wf = Workflow(scenario["scenario_id"])
+    wf = Workflow(scenario["scenario_id"], memory_path=MEMORY)
     st = wf.store
+    if wf.stage == "blocked":
+        return wf
     choices = {c["stage"]: c for c in scenario["human_choices"]}
     wf.ingest()
     for act in sorted(scenario["activation"], key=lambda a: a["order"]):
@@ -144,8 +149,6 @@ def gaps(scenario: dict) -> list[str]:
          if (f["kind"], None) not in SUPPORTED_FAULTS and (f["kind"], f["target_tool"]) not in SUPPORTED_FAULTS]
     if scenario["memory"]["pause_at"]:
         g.append(f"restart/resume at {scenario['memory']['pause_at']} not simulated")
-    if scenario["inheritance"]:
-        g.append("long-term inheritance from S1 not implemented")
     if any(c["stage"] == "fallback" for c in scenario["human_choices"]):
         g.append("fallback approval stage not implemented")
     return g
