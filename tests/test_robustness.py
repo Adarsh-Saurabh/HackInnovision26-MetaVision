@@ -68,7 +68,9 @@ def test_reject_at_delta_keeps_committed_v1_effects():
     assert wf.stage == "rejected"
     st = wf.store
     assert st.get("sponsor", "sponsor-aster")["commitment_paise"] == 6000000
-    assert st.get("deliverable", "D4")["status"] == "cancelled"
+    # D3 is cancelled first, so the conflict stops the run before D4 (oracle profile-s1-rejected-delta)
+    assert st.get("deliverable", "D4")["status"] == "planned"
+    assert any(e["deliverable_id"] == "D4" for e in st.get("document", "doc-run-sheet")["entries"])
     d3 = st.get("deliverable", "D3")
     assert d3["status"] == "done"
     assert {h["actor"] for h in st.history("deliverable", "D3")} == {"person-social"}

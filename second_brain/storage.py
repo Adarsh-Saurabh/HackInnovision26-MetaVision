@@ -31,6 +31,7 @@ KINDS: dict[str, tuple[str | None, str | None, str]] = {
     "calendar": ("calendar.json", "calendar_items", "calendar_id"),
     "post": (None, None, "post_id"),
     "draft": (None, None, "draft_id"),
+    "outbox": (None, None, "message_id"),
 }
 
 SCHEMA = """
