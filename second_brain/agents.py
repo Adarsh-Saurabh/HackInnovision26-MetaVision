@@ -121,7 +121,13 @@ def communication_agent(store: "Store", source_id: str) -> dict:
     old_paise = new_paise = None
     currency = None
     m = re.search(r"from\s+INR\s*([\d,]+(?:\.\d+)?)\s+to\s+INR\s*([\d,]+(?:\.\d+)?)", body, re.I)
-    if m:
+    confirmed = re.search(r"commitment\s+is\s+INR\s*([\d,]+(?:\.\d+)?)", body, re.I)
+    if confirmed:
+        # e.g. "our confirmed revised commitment is INR 60,000 ... The original INR 100,000 agreement"
+        new_paise, currency = _rupees_to_paise(confirmed.group(1)), "INR"
+        orig = re.search(r"original\s+INR\s*([\d,]+(?:\.\d+)?)", body, re.I)
+        old_paise = _rupees_to_paise(orig.group(1)) if orig else None
+    elif m:
         old_paise, new_paise, currency = _rupees_to_paise(m.group(1)), _rupees_to_paise(m.group(2)), "INR"
     else:
         amounts = re.findall(r"INR\s*([\d,]+(?:\.\d+)?)", body)
@@ -619,6 +625,13 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
 
     cancel_ids: dict[str, str] = {}
     run_sheet_aid = None
+    # D3 first: the time-sensitive scheduled post is cancelled before other reversible items.
+    if dispositions.get("D3") == "cancel":
+        cancel_ids["D3"] = add_action(
+            "update_deliverable", "deliverable", "D3", {"status": "cancelled"}, depends_on=[a_sponsor],
+            reason=f"{tier_after} allows {allowed_posts} social post; D2 already satisfies it and D3 is reversible.",
+            summary="D3 second social post → cancelled before publication")
+        business.append(cancel_ids["D3"])
     for did in sorted(dispositions):
         if dispositions[did] != "cancel" or did == "D3":
             continue
@@ -638,12 +651,6 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
                 reason=f"Remove cancelled {did} entry; leave unrelated entries untouched.",
                 summary=f"{doc.get('title', doc_id)}: remove {did} entry")
             business.append(run_sheet_aid)
-    if dispositions.get("D3") == "cancel":
-        cancel_ids["D3"] = add_action(
-            "update_deliverable", "deliverable", "D3", {"status": "cancelled"}, depends_on=[a_sponsor],
-            reason=f"{tier_after} allows {allowed_posts} social post; D2 already satisfies it and D3 is reversible.",
-            summary="D3 second social post → cancelled before publication")
-        business.append(cancel_ids["D3"])
 
     benefits = store.get("document", "doc-aster-benefits") if "doc-aster-benefits" in impact["documents"] else None
     a_benefits = None
@@ -731,14 +738,24 @@ def planning_agent(store: "Store", proposal: dict, impact: dict, plan_version: i
             f"The main-stage banner (D1) was already in production before your note; our organizer will confirm how "
             f"we handle it. {d3_sponsor}\n\nThe revised package is pending organizer approval, and we will confirm "
             f"once it is approved.\n\nRegards,\nKavya Iyer\nInnovision Campus Fest 2026")
-    add_action(
+    subject = f"Updated {sponsor_name} benefits proposal"
+    a_draft = add_action(
         "create_draft", "draft", "draft-aster-reply",
         {"draft_id": "draft-aster-reply", "to_contact_id": proposal.get("contact_id"),
-         "subject": f"Updated {sponsor_name} benefits proposal", "body": body, "sent": False},
+         "subject": subject, "body": body, "sent": False},
         op="create", scope="business_records", reversible=True,
         depends_on=[x for x in (a_sponsor, a_benefits) if x],
         reason="Sponsor asked for an updated proposal; drafts are not delivery.",
         summary=f"Draft reply to {_person_name(store, proposal.get('sender_id'))} (not sent)")
+    # Sending is a separate action in its own scope: it only runs if 'sponsor_send' is approved,
+    # and the exact body is part of its identity, so a changed v2 reply needs fresh approval.
+    add_action(
+        "send_email", "outbox", "sent-aster-reply",
+        {"message_id": "sent-aster-reply", "draft_id": "draft-aster-reply",
+         "to_contact_id": proposal.get("contact_id"), "subject": subject, "body": body},
+        op="create", scope="sponsor_send", reversible=False, depends_on=[a_draft],
+        reason="Deliver the approved reply to the sponsor contact.",
+        summary=f"Send reply to {_person_name(store, proposal.get('sender_id'))}")
 
     plan = {
         "plan_id": f"plan-v{plan_version}", "version": plan_version, "parent_plan_id": parent_plan_id,

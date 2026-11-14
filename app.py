@@ -331,7 +331,11 @@ with left:
                 st.markdown(f"- {f}")
         else:
             msgs = {"rejected": ("info", "Plan rejected. Business records were not changed by the rejected plan."),
-                    "blocked": ("warning", "Sender not authorised: clarification needed, nothing changed."),
+                    "blocked": ("warning", "Stopped safely (unverified sender, unreadable source or failed "
+                                           "privacy check): nothing changed. See the timeline."),
+                    "needs_clarification": ("warning", "Paused before planning: nothing changed. "
+                                                       "Questions for the organiser:\n\n"
+                                                       + "\n".join(f"- {q}" for q in wf.clarification_questions)),
                     "failed": ("error", "Execution stopped safely; see the timeline."),
                     "verification_failed": ("error", "Verification found problems; see the Verification tab.")}
             kind, text = msgs.get(stage, ("info", f"Stage: {stage}"))

@@ -20,11 +20,16 @@ APP_NAMES = {
     "calendar": "Calendar",
     "post": "Team chat",
     "draft": "Email drafts",
+    "outbox": "Email (sent)",
 }
 
 
 class TransientToolError(Exception):
     """A temporary tool failure that happened before any write; safe to retry."""
+
+
+class ToolTimeout(Exception):
+    """The tool timed out after possibly writing: outcome unknown, must reconcile by read-back."""
 
 
 class Tools:
@@ -77,12 +82,37 @@ class Tools:
                    {"op_key": key})
             raise
 
+        for f in self.faults:
+            if (f["kind"] == "timeout_after_write" and f["fault_id"] not in self.fired
+                    and f["target_tool"] == tool and f["target_id"] == target and f["attempt"] == attempt):
+                self.fired.add(f["fault_id"])
+                st.op_upsert(key, tool, kind, target, action["changes"], "unknown", attempt)
+                st.log("Execution", f"{app}: {tool} {target} attempt {attempt} timed out after sending the "
+                       "write; outcome unknown", "error", {"op_key": key})
+                raise ToolTimeout(f"{tool} {target}: timeout after possible write")
+
         receipt = {"op_key": key, "tool": tool, "kind": kind, "target_id": target,
                    "status": "committed", "version": version, "attempt": attempt}
         st.op_upsert(key, tool, kind, target, action["changes"], "committed", attempt, receipt)
         retry_note = f" on attempt {attempt}" if attempt > 1 else ""
         st.log("Execution", f"{app}: {tool} {target} committed{retry_note} (now v{version})",
                "write", receipt)
+        return receipt
+
+    def reconcile(self, action: dict) -> dict | None:
+        """After an unknown outcome, read the record back. If the write landed, record it as committed."""
+        st = self.store
+        rec = st.get(action["kind"], action["target_id"])
+        if rec is None or any(rec.get(k) != v for k, v in action["changes"].items()):
+            return None
+        prior = st.op_get(action["op_key"]) or {"attempts": 1}
+        receipt = {"op_key": action["op_key"], "tool": action["tool"], "kind": action["kind"],
+                   "target_id": action["target_id"], "status": "committed", "version": rec["version"],
+                   "attempt": prior["attempts"], "reconciled": True}
+        st.op_upsert(action["op_key"], action["tool"], action["kind"], action["target_id"], action["changes"],
+                     "committed", prior["attempts"], receipt)
+        st.log("Execution", f"{APP_NAMES.get(action['kind'], action['kind'])}: read-back shows {action['target_id']} "
+               f"already holds the new values (v{rec['version']}); write confirmed, no retry needed", "verify")
         return receipt
 
     def _external_edit(self, fault: dict, kind: str, target: str) -> None:
