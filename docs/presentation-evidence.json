@@ -1,0 +1,279 @@
+{
+  "reviewed_commit": "110bb11",
+  "checked_at_utc": "2026-11-14T01:06:48.105407+00:00",
+  "mode": "deterministic_offline",
+  "test_scope": "One independent backend smoke run of S1-main-demo. Full pytest suite, UI, live Gemini, and restart durability not tested.",
+  "before": {
+    "currency": "INR",
+    "total_commitments_paise": 25000000,
+    "planned_expenses_paise": 22000000,
+    "forecast_balance_paise": 3000000,
+    "total_cash_received_paise": 0
+  },
+  "after": {
+    "currency": "INR",
+    "total_commitments_paise": 21000000,
+    "planned_expenses_paise": 22000000,
+    "forecast_balance_paise": -1000000,
+    "total_cash_received_paise": 0
+  },
+  "v1": {
+    "version": 1,
+    "actions": 14,
+    "flags": 4
+  },
+  "v2": {
+    "version": 2,
+    "actions": 13
+  },
+  "delta": {
+    "covered": 1,
+    "needs_approval": 6,
+    "reuse": 6
+  },
+  "verification": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "A1 update_sponsor sponsor-aster",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A2 update_decision DEC-07",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A3 create_decision DEC-05-SILVER-01",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A4 update_decision DEC-05",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A5 update_deliverable D4",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A6 update_document doc-run-sheet",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A7 update_document doc-aster-benefits",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A8 create_calendar_item cal-sponsor-review",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A9 post_internal post-person-design",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A10 post_internal post-person-social",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A11 post_internal post-person-events",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A12 post_internal post-person-finance",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "A13 create_draft draft-aster-reply",
+        "ok": true,
+        "detail": "all fields match"
+      },
+      {
+        "name": "financials recomputed",
+        "ok": true,
+        "detail": "forecast -INR 10,000 vs plan -INR 10,000"
+      },
+      {
+        "name": "run sheet has no D4 entry",
+        "ok": true,
+        "detail": "3 entries"
+      },
+      {
+        "name": "unrelated run-sheet entries unchanged",
+        "ok": true,
+        "detail": "welcome/housekeeping/closing intact"
+      },
+      {
+        "name": "sponsor-brightline commitment unchanged",
+        "ok": true,
+        "detail": "INR 90,000 (expected INR 90,000)"
+      },
+      {
+        "name": "sponsor-corvex commitment unchanged",
+        "ok": true,
+        "detail": "INR 60,000 (expected INR 60,000)"
+      },
+      {
+        "name": "exactly 1 sponsor review calendar item",
+        "ok": true,
+        "detail": "found 1"
+      },
+      {
+        "name": "cal-volunteer-briefing still present",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "every approved action executed",
+        "ok": true,
+        "detail": "all approved actions committed"
+      }
+    ],
+    "failed": 0,
+    "passed": 21,
+    "skipped_action_ids": []
+  },
+  "replay": {
+    "deliveries": 10,
+    "duplicates_ignored": 10,
+    "actions_reused": 13,
+    "new_effects": 0
+  },
+  "sponsor_write_attempts": 2,
+  "deliverables": [
+    {
+      "deliverable_id": "D1",
+      "status": "in_production",
+      "version": 1
+    },
+    {
+      "deliverable_id": "D2",
+      "status": "done",
+      "version": 1
+    },
+    {
+      "deliverable_id": "D3",
+      "status": "done",
+      "version": 2
+    },
+    {
+      "deliverable_id": "D4",
+      "status": "cancelled",
+      "version": 2
+    }
+  ],
+  "dec07_status": "at_risk",
+  "draft_sent": [
+    false
+  ],
+  "post_count": 4,
+  "action_log": [
+    {
+      "seq": 21,
+      "at": "2026-11-14T06:36:48.097+05:30",
+      "agent": "Coordinator",
+      "kind": "approval",
+      "message": "Plan v1 ready (14 actions, 4 flags); waiting for organiser approval. Nothing has been changed yet.",
+      "data": null
+    },
+    {
+      "seq": 22,
+      "at": "2026-11-14T06:36:48.097+05:30",
+      "agent": "Coordinator",
+      "kind": "approval",
+      "message": "Plan v1 approved by organiser for scopes: business_records, internal_notifications. Sponsor send not selected, so any sponsor reply stays an unsent draft.",
+      "data": {
+        "approved_actions": 14
+      }
+    },
+    {
+      "seq": 25,
+      "at": "2026-11-14T06:36:48.097+05:30",
+      "agent": "Coordinator",
+      "kind": "retry",
+      "message": "Transient failure before write on sponsor-aster: safe to retry the same operation (retry 1/2, same idempotency key)",
+      "data": null
+    },
+    {
+      "seq": 33,
+      "at": "2026-11-14T06:36:48.099+05:30",
+      "agent": "Execution",
+      "kind": "conflict",
+      "message": "Deliverables tracker: update_deliverable D3 refused, record changed underneath (expected v1, found v2); no write made",
+      "data": {
+        "op_key": "dd51bc9d58e7848d"
+      }
+    },
+    {
+      "seq": 34,
+      "at": "2026-11-14T06:36:48.099+05:30",
+      "agent": "Coordinator",
+      "kind": "conflict",
+      "message": "Version conflict on D3 (expected v1, found v2). This is NOT a transient error, so no retry: stopping dependent actions and re-planning from fresh state.",
+      "data": null
+    },
+    {
+      "seq": 48,
+      "at": "2026-11-14T06:36:48.101+05:30",
+      "agent": "Coordinator",
+      "kind": "approval",
+      "message": "Plan plan-v2 (parent plan-v1): 6 committed actions reused, 6 changed actions need fresh approval. Waiting for organiser.",
+      "data": null
+    },
+    {
+      "seq": 49,
+      "at": "2026-11-14T06:36:48.101+05:30",
+      "agent": "Coordinator",
+      "kind": "approval",
+      "message": "Delta approval for plan-v2: 6 changed actions approved (business_records, internal_notifications)",
+      "data": null
+    },
+    {
+      "seq": 61,
+      "at": "2026-11-14T06:36:48.103+05:30",
+      "agent": "Coordinator",
+      "kind": "verified",
+      "message": "Verification passed: 21 checks passed, 0 failed",
+      "data": null
+    },
+    {
+      "seq": 62,
+      "at": "2026-11-14T06:36:48.103+05:30",
+      "agent": "Coordinator",
+      "kind": "replay",
+      "message": "Replay: mail-aster-002 delivered 10 more times; 10 recognised as duplicates",
+      "data": null
+    },
+    {
+      "seq": 76,
+      "at": "2026-11-14T06:36:48.105+05:30",
+      "agent": "Coordinator",
+      "kind": "replay",
+      "message": "Replay result: 13 actions reused from ledger, 0 new effects",
+      "data": {
+        "deliveries": 10,
+        "duplicates_ignored": 10,
+        "actions_reused": 13,
+        "new_effects": 0
+      }
+    }
+  ],
+  "notes": [
+    "Captured by an independent direct backend smoke driver against the pinned remote commit, without a UI or external API calls.",
+    "Approvals in this check were supplied programmatically for fixture organizer and scopes. This is not human authentication testing.",
+    "The verification count is the application verification report for one run, not the number of pytest tests or covered scenarios.",
+    "Log timestamps use the scenario clock; do not derive measured latency or throughput from them.",
+    "This evidence is a static snapshot. Re-run against the final submitted commit before updating presentation claims."
+  ]
+}
