@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:docs.langchain.com)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:ai.google.dev)",
+      "WebFetch(domain:aistudio.google.com)",
+      "PowerShell(git config user.name)",
+      "Edit(/.claude/skills/update-work-done/**)",
+      "Bash(git config *)",
+      "Bash(git fetch *)"
+    ]
+  }
+}
