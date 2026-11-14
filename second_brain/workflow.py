@@ -169,7 +169,12 @@ class Workflow:
         if bad:
             self._log(f"Read-back mismatch on {', '.join(bad)}; internal posts held back", "error")
             return False
-        self._log(f"Read back {n} committed business records: all match. Releasing internal posts.", "verify")
+        if n:
+            self._log(f"Read back {n} committed business records: all match. Releasing internal posts.",
+                      "verify")
+        else:
+            self._log("No business records committed in this plan, so there is nothing to read back; "
+                      "posts still wait on their own dependencies.", "verify")
         return True
 
     def _handle_conflict(self, action: dict, exc: VersionConflict) -> str:
@@ -220,8 +225,8 @@ class Workflow:
                   f"({', '.join(scopes)})", "approval")
 
     def verify(self) -> dict:
-        self._require("executed", "verified")
-        report = verification_agent(self.store, self.plan, self.receipts)
+        self._require("executed", "verified", "failed")
+        report =verification_agent(self.store, self.plan, self.receipts)
         not_run = [a["action_id"] for a in self.plan["actions"] if a["op_key"] in self.approved_keys
                    and self.action_status.get(a["op_key"]) not in ("committed", "reused")]
         report["checks"].append({"name": "every approved action executed", "ok": not not_run,
